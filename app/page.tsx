@@ -125,40 +125,112 @@ const FloatingParticles = () => {
   );
 };
 
-// Initial Screen Power On Animation (Digital Pixel Modern)
+
+// Initial Screen Power On Animation (Street Tech / Futuristic)
 const ScreenPowerOn = () => {
-  const [show, setShow] = React.useState(true);
+  const [stage, setStage] = React.useState(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShow(false), 2200);
-    return () => clearTimeout(timer);
+    // Show entrance for 2 seconds, then trigger slide up
+    const timer1 = setTimeout(() => setStage(1), 2200);
+    // Unmount completely after slide animation finishes
+    const timer2 = setTimeout(() => setStage(2), 3000);
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
   }, []);
 
-  if (!show) return null;
-
-  // 20 columns * 20 rows = 400 blocks
-  const blocks = Array.from({ length: 400 });
+  if (stage === 2) return null;
 
   return (
-    <div className="fixed inset-0 z-[999] pointer-events-none flex flex-wrap overflow-hidden">
-      {blocks.map((_, i) => {
-        // Pseudo-random delay using index to prevent hydration mismatch (0 to 0.99)
-        const pseudoRandom = ((i * 17) % 100) / 100; 
-        return (
+    <motion.div 
+      animate={stage === 1 ? { y: "-100vh" } : { y: "0vh" }}
+      transition={{ duration: 0.8, ease: [0.85, 0, 0.15, 1] }} // Fast mechanical slide up
+      className="fixed inset-0 z-[9999] bg-[#050505] flex flex-col items-center justify-center overflow-hidden border-b-4 border-amber-500"
+    >
+      {/* Street Tech / HUD Accents */}
+      <div className="absolute top-6 left-6 md:top-10 md:left-10 flex flex-col gap-1 text-[10px] font-mono text-neutral-600 tracking-widest">
+        <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>SYS.BOOT_SEQ // 0xFA89</motion.span>
+        <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>UPLINK_ESTABLISHED</motion.span>
+        <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>USER_AUTH : VERIFIED</motion.span>
+      </div>
+
+      <div className="absolute top-6 right-6 md:top-10 md:right-10 flex gap-2 items-center">
+        <span className="text-[10px] font-mono text-neutral-600 tracking-widest">REC</span>
+        <motion.div 
+          animate={{ opacity: [0, 1, 0] }} 
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-2 h-2 rounded-full bg-red-600"
+        />
+      </div>
+      
+      {/* Grid Pattern Background */}
+      <div 
+        className="absolute inset-0 opacity-10 pointer-events-none" 
+        style={{ backgroundImage: 'radial-gradient(#fbbf24 1px, transparent 1px)', backgroundSize: '30px 30px' }}
+      ></div>
+
+      {/* Main Typography */}
+      <div className="relative flex flex-col items-center z-10">
+        
+        {/* Scanning Line Reveal Text */}
+        <div className="relative inline-block py-4 px-2">
+          {/* Revealed Text */}
+          <motion.h1 
+            initial={{ clipPath: "inset(-50% 100% -50% -50%)", opacity: 0 }}
+            animate={{ clipPath: "inset(-50% -50% -50% -50%)", opacity: 1 }}
+            transition={{ duration: 1.2, ease: "easeInOut", delay: 0.3 }}
+            className="text-4xl sm:text-5xl md:text-[6rem] font-black text-amber-500 font-mono uppercase tracking-tighter drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]"
+          >
+            INITIALIZING
+          </motion.h1>
+          
+          {/* Scanning Laser Line */}
           <motion.div
-            key={i}
-            className="w-[5vw] h-[5vh] bg-[#050505]"
-            initial={{ opacity: 1, scale: 1.05 }}
-            animate={{ opacity: 0, scale: 0 }}
-            transition={{
-              duration: 0.5,
-              delay: pseudoRandom * 1.5, // Scattered fade out over 1.5s
-              ease: "circOut"
+            initial={{ left: "0%", opacity: 0 }}
+            animate={{ left: "100%", opacity: [0, 1, 1, 0] }}
+            transition={{ 
+              duration: 1.2, 
+              ease: "easeInOut", 
+              delay: 0.3,
+              opacity: { duration: 1.2, times: [0, 0.1, 0.9, 1] } 
             }}
+            className="absolute top-2 bottom-2 w-[4px] md:w-[6px] bg-white shadow-[0_0_20px_rgba(255,255,255,1)] rounded-full z-10"
           />
-        );
-      })}
-    </div>
+        </div>
+
+        {/* Cyberpunk Auth Badge */}
+        <motion.div
+          initial={{ opacity: 0, clipPath: "inset(0 100% 0 0)" }}
+          animate={{ opacity: 1, clipPath: "inset(0 0% 0 0)" }}
+          transition={{ duration: 0.5, delay: 1.4, ease: "circOut" }}
+          className="absolute -bottom-20 md:-bottom-24 right-0 md:-right-4 flex flex-col items-end z-20"
+        >
+          <div className="text-amber-500 text-[8px] md:text-[10px] font-mono mb-1 tracking-[0.2em] opacity-80 flex gap-2 items-center">
+            <span className="inline-block w-8 h-[1px] bg-amber-500/50"></span>
+            SYS.ID: 894-XX
+          </div>
+          <div 
+            className="flex items-center gap-3 bg-amber-500 text-black font-mono text-[10px] md:text-xs font-black tracking-widest px-4 py-2 shadow-[0_0_20px_rgba(251,191,36,0.3)]"
+            style={{ clipPath: "polygon(12px 0, 100% 0, 100% 100%, 0 100%, 0 12px)" }}
+          >
+            <span className="w-2 h-2 bg-black animate-pulse"></span>
+            AUTH : GRANTED
+          </div>
+        </motion.div>
+      </div>
+      
+      {/* Loading bar */}
+      <div className="absolute bottom-20 w-48 md:w-64 h-[2px] bg-neutral-800">
+        <motion.div 
+          initial={{ width: "0%" }}
+          animate={{ width: "100%" }}
+          transition={{ duration: 1.2, delay: 0.5, ease: "circInOut" }}
+          className="h-full bg-amber-500 shadow-[0_0_10px_rgba(251,191,36,0.8)]"
+        />
+      </div>
+    </motion.div>
   );
 };
 
