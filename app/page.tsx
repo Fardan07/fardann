@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { motion, Variants, useAnimation, useInView } from "framer-motion";
+import { motion, Variants, useAnimation, useInView, AnimatePresence } from "framer-motion";
 import {
   Mail,
   ExternalLink,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Briefcase,
   GraduationCap
 } from "lucide-react";
@@ -126,16 +128,30 @@ const FloatingParticles = () => {
 };
 
 
-// Initial Screen Power On Animation (Street Tech / Futuristic)
+// Initial Screen Intro Animation (Pure Modern Minimalist LOADING)
 const ScreenPowerOn = () => {
+  const [progress, setProgress] = React.useState(0);
   const [stage, setStage] = React.useState(0);
 
   useEffect(() => {
-    // Show entrance for 2 seconds, then trigger slide up
-    const timer1 = setTimeout(() => setStage(1), 2200);
-    // Unmount completely after slide animation finishes
-    const timer2 = setTimeout(() => setStage(2), 3000);
+    // Smooth counter from 0 to 100
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          return 100;
+        }
+        return prev + 2;
+      });
+    }, 25);
+
+    // Trigger curtain split exit after 1.8s
+    const timer1 = setTimeout(() => setStage(1), 1800);
+    // Unmount completely after animation
+    const timer2 = setTimeout(() => setStage(2), 2600);
+
     return () => {
+      clearInterval(interval);
       clearTimeout(timer1);
       clearTimeout(timer2);
     };
@@ -144,98 +160,63 @@ const ScreenPowerOn = () => {
   if (stage === 2) return null;
 
   return (
-    <motion.div 
-      animate={stage === 1 ? { y: "-100vh" } : { y: "0vh" }}
-      transition={{ duration: 0.8, ease: [0.85, 0, 0.15, 1] }} // Fast mechanical slide up
-      className="fixed inset-0 z-[9999] bg-[#050505] flex flex-col items-center justify-center overflow-hidden border-b-4 border-amber-500"
-    >
-      {/* Street Tech / HUD Accents */}
-      <div className="absolute top-6 left-6 md:top-10 md:left-10 flex flex-col gap-1 text-[10px] font-mono text-neutral-600 tracking-widest">
-        <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>SYS.BOOT_SEQ // 0xFA89</motion.span>
-        <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>UPLINK_ESTABLISHED</motion.span>
-        <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>USER_AUTH : VERIFIED</motion.span>
-      </div>
-
-      <div className="absolute top-6 right-6 md:top-10 md:right-10 flex gap-2 items-center">
-        <span className="text-[10px] font-mono text-neutral-600 tracking-widest">REC</span>
-        <motion.div 
-          animate={{ opacity: [0, 1, 0] }} 
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-2 h-2 rounded-full bg-red-600"
-        />
-      </div>
-      
-      {/* Grid Pattern Background */}
-      <div 
-        className="absolute inset-0 opacity-10 pointer-events-none" 
-        style={{ backgroundImage: 'radial-gradient(#fbbf24 1px, transparent 1px)', backgroundSize: '30px 30px' }}
-      ></div>
-
-      {/* Main Typography */}
-      <div className="relative flex flex-col items-center z-10">
-        
-        {/* Scanning Line Reveal Text */}
-        <div className="relative inline-block py-4 px-2">
-          {/* Revealed Text */}
-          <motion.h1 
-            initial={{ clipPath: "inset(-50% 100% -50% -50%)", opacity: 0 }}
-            animate={{ clipPath: "inset(-50% -50% -50% -50%)", opacity: 1 }}
-            transition={{ duration: 1.2, ease: "easeInOut", delay: 0.3 }}
-            className="text-4xl sm:text-5xl md:text-[6rem] font-black text-amber-500 font-mono uppercase tracking-tighter drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]"
+    <div className="fixed inset-0 z-[9999] pointer-events-none flex flex-col select-none overflow-hidden">
+      {/* Top Half Panel */}
+      <motion.div
+        animate={stage === 1 ? { y: "-100%" } : { y: "0%" }}
+        transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
+        className="w-full h-1/2 bg-[#050505] flex items-end justify-center relative z-20 border-b border-neutral-800/40"
+      >
+        <div className="pb-4 text-center">
+          <motion.h1
+            initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="text-3xl sm:text-5xl md:text-6xl font-black font-mono text-white tracking-[0.5em] uppercase drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]"
           >
-            INITIALIZING
+            LOADING
           </motion.h1>
-          
-          {/* Scanning Laser Line */}
-          <motion.div
-            initial={{ left: "0%", opacity: 0 }}
-            animate={{ left: "100%", opacity: [0, 1, 1, 0] }}
-            transition={{ 
-              duration: 1.2, 
-              ease: "easeInOut", 
-              delay: 0.3,
-              opacity: { duration: 1.2, times: [0, 0.1, 0.9, 1] } 
-            }}
-            className="absolute top-2 bottom-2 w-[4px] md:w-[6px] bg-white shadow-[0_0_20px_rgba(255,255,255,1)] rounded-full z-10"
-          />
         </div>
+      </motion.div>
 
-        {/* Cyberpunk Auth Badge */}
+      {/* Middle Thin Golden Line Sweep */}
+      <div className="relative w-full h-0 z-30 flex items-center justify-center">
         <motion.div
-          initial={{ opacity: 0, clipPath: "inset(0 100% 0 0)" }}
-          animate={{ opacity: 1, clipPath: "inset(0 0% 0 0)" }}
-          transition={{ duration: 0.5, delay: 1.4, ease: "circOut" }}
-          className="absolute -bottom-20 md:-bottom-24 right-0 md:-right-4 flex flex-col items-end z-20"
-        >
-          <div className="text-amber-500 text-[8px] md:text-[10px] font-mono mb-1 tracking-[0.2em] opacity-80 flex gap-2 items-center">
-            <span className="inline-block w-8 h-[1px] bg-amber-500/50"></span>
-            SYS.ID: 894-XX
-          </div>
-          <div 
-            className="flex items-center gap-3 bg-amber-500 text-black font-mono text-[10px] md:text-xs font-black tracking-widest px-4 py-2 shadow-[0_0_20px_rgba(251,191,36,0.3)]"
-            style={{ clipPath: "polygon(12px 0, 100% 0, 100% 100%, 0 100%, 0 12px)" }}
-          >
-            <span className="w-2 h-2 bg-black animate-pulse"></span>
-            AUTH : GRANTED
-          </div>
-        </motion.div>
-      </div>
-      
-      {/* Loading bar */}
-      <div className="absolute bottom-20 w-48 md:w-64 h-[2px] bg-neutral-800">
-        <motion.div 
-          initial={{ width: "0%" }}
-          animate={{ width: "100%" }}
-          transition={{ duration: 1.2, delay: 0.5, ease: "circInOut" }}
-          className="h-full bg-amber-500 shadow-[0_0_10px_rgba(251,191,36,0.8)]"
+          initial={{ scaleX: 0, opacity: 0 }}
+          animate={{ scaleX: 1, opacity: [0, 1, 1, 0.8] }}
+          transition={{ duration: 1.2, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full max-w-3xl h-[1px] bg-gradient-to-r from-transparent via-amber-400 to-transparent shadow-[0_0_20px_rgba(251,191,36,1)] origin-center"
         />
       </div>
-    </motion.div>
+
+      {/* Bottom Half Panel */}
+      <motion.div
+        animate={stage === 1 ? { y: "100%" } : { y: "0%" }}
+        transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
+        className="w-full h-1/2 bg-[#050505] flex items-start justify-center relative z-20 border-t border-neutral-800/40"
+      >
+        <div className="pt-6 flex flex-col items-center gap-3">
+          <div className="w-48 sm:w-64 h-[2px] bg-neutral-800/80 rounded-full overflow-hidden relative">
+            <div 
+              style={{ width: `${progress}%` }}
+              className="h-full bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-300 shadow-[0_0_15px_rgba(251,191,36,0.8)] transition-all duration-75 rounded-full"
+            />
+          </div>
+          <div className="text-amber-400 font-mono text-xs md:text-sm tracking-[0.3em] font-bold">
+            {progress < 10 ? `0${progress}` : progress} %
+          </div>
+        </div>
+      </motion.div>
+    </div>
   );
 };
 
 export default function Portfolio() {
   const [selectedCert, setSelectedCert] = useState<{image: string, title: string} | null>(null);
+  const [activeProject, setActiveProject] = useState(0);
+  const [projectDir, setProjectDir] = useState<number>(1);
+  const [activeCert, setActiveCert] = useState(0);
+  const [certDir, setCertDir] = useState<number>(1);
 
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
@@ -332,11 +313,6 @@ export default function Portfolio() {
         >
           {/* Text Content */}
           <div className="flex-1 text-center lg:text-left">
-            <motion.div variants={itemVariants} className="mb-4 inline-flex items-center gap-3 bg-neutral-800/50 pr-6 pl-2 py-2 rounded-full border border-neutral-700/50">
-              <span className="bg-amber-500 text-xs font-bold px-3 py-1 rounded-full text-black">FRONTEND DEV</span>
-              <span className="text-neutral-300 text-sm font-mono">AVAILABLE FOR WORK</span>
-            </motion.div>
-            
             <motion.h1 variants={titleVariants} className="text-huge font-extrabold mb-2 uppercase">
               PORTFOLIO <br className="hidden lg:block"/>
               <span className="text-stroke">2026</span>
@@ -526,7 +502,6 @@ export default function Portfolio() {
                 {[
                   { name: "INDONESIA", percent: "95%" },
                   { name: "ENGLISH", percent: "75%" },
-                  { name: "JAVANESE", percent: "80%" },
                 ].map((lang, i) => (
                   <div key={i}>
                     <div className="flex justify-between text-sm font-mono mb-3 text-neutral-400">
@@ -649,13 +624,13 @@ export default function Portfolio() {
       </section>
 
       {/* Projects Section */}
-      <section id="projects" className="py-24 px-4 relative z-10">
-        <div className="max-w-6xl mx-auto">
+      <section id="projects" className="py-24 px-4 relative z-10 overflow-hidden">
+        <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-16 flex flex-col items-center text-center"
+            className="mb-12 flex flex-col items-center text-center"
           >
             <motion.h2 
               initial={{ opacity: 0.1, textShadow: "0 0 0px rgba(251,191,36,0)" }}
@@ -667,62 +642,183 @@ export default function Portfolio() {
             <p className="text-amber-400 font-mono text-sm">NON AI / REAL CODE</p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { title: "Admin Dashboard", category: "Web App", image: "/foto-project/assignment-admindashboard.png", github: "https://github.com/Fardan07/assigment-management" },
-              { title: "Facility Helpdesk", category: "System", image: "/foto-project/weblaporfasilitas.png", github: "https://github.com/Fardan07/project_ukl_sija2" },
-              { title: "Web Dinamis", category: "Fullstack", image: "/foto-project/projectwebdinamis.png", github: "https://github.com/Fardan07/web-dinamis-project" },
-            ].map((project, i) => (
+          {/* 3D Rotating Project Carousel Container */}
+          <div className="relative min-h-[440px] md:min-h-[460px] flex items-center justify-center [perspective:1200px]">
+            <AnimatePresence custom={projectDir} mode="wait">
               <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="group relative h-64 rounded-2xl overflow-hidden border border-neutral-800 hover:border-amber-500/50 transition-colors"
+                key={activeProject}
+                custom={projectDir}
+                variants={{
+                  enter: (dir: number) => ({
+                    x: dir > 0 ? 160 : -160,
+                    scale: 0.85,
+                    opacity: 0,
+                    filter: "blur(6px)",
+                  }),
+                  center: {
+                    x: 0,
+                    scale: 1,
+                    opacity: 1,
+                    filter: "blur(0px)",
+                    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
+                  },
+                  exit: (dir: number) => ({
+                    x: dir > 0 ? -160 : 160,
+                    scale: 0.85,
+                    opacity: 0,
+                    filter: "blur(6px)",
+                    transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
+                  }),
+                }}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                style={{ transformStyle: "preserve-3d" }}
+                className="w-full max-w-3xl relative rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-950/90 shadow-[0_0_40px_rgba(251,191,36,0.12)] p-6 md:p-10 flex flex-col justify-between min-h-[380px] md:min-h-[420px]"
               >
+                {/* Cyberpunk corner markers */}
+                <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-amber-500/70 z-20"></div>
+                <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-amber-500/70 z-20"></div>
+                <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-amber-500/70 z-20"></div>
+                <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-amber-500/70 z-20"></div>
+
                 {/* Project Image Background */}
                 <Image 
-                  src={project.image} 
-                  alt={project.title} 
+                  src={[
+                    { title: "Admin Dashboard", category: "Web App", desc: "Sistem manajemen tugas & dashboard administrator modern dengan analitik intuitif.", image: "/foto-project/assignment-admindashboard.png", github: "https://github.com/Fardan07/assigment-management" },
+                    { title: "Facility Helpdesk", category: "System", desc: "Digitalisasi pelaporan fasilitas sekolah dengan alur tiket terpadu dan UX interaktif.", image: "/foto-project/weblaporfasilitas.png", github: "https://github.com/Fardan07/project_ukl_sija2" },
+                    { title: "Web Dinamis", category: "Fullstack", desc: "Platform web edukasi & artikel dinamis berbasis PHP & SQL dengan UX copywriting persuasif.", image: "/foto-project/projectwebdinamis.png", github: "https://github.com/Fardan07/web-dinamis-project" },
+                  ][activeProject].image} 
+                  alt={[
+                    { title: "Admin Dashboard", category: "Web App", desc: "Sistem manajemen tugas & dashboard administrator modern dengan analitik intuitif.", image: "/foto-project/assignment-admindashboard.png", github: "https://github.com/Fardan07/assigment-management" },
+                    { title: "Facility Helpdesk", category: "System", desc: "Digitalisasi pelaporan fasilitas sekolah dengan alur tiket terpadu dan UX interaktif.", image: "/foto-project/weblaporfasilitas.png", github: "https://github.com/Fardan07/project_ukl_sija2" },
+                    { title: "Web Dinamis", category: "Fullstack", desc: "Platform web edukasi & artikel dinamis berbasis PHP & SQL dengan UX copywriting persuasif.", image: "/foto-project/projectwebdinamis.png", github: "https://github.com/Fardan07/web-dinamis-project" },
+                  ][activeProject].title} 
                   fill 
-                  className="object-cover opacity-40 group-hover:opacity-80 transition-opacity duration-300 grayscale group-hover:grayscale-0" 
+                  className="object-cover opacity-35 hover:opacity-60 transition-opacity duration-500" 
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
-                
-                {/* Project Content */}
-                <div className="absolute inset-0 p-6 flex flex-col justify-end transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                  <div className="flex justify-between items-end relative z-10">
-                    <div>
-                      <p className="text-xs font-mono font-bold text-amber-400/80 mb-1">{project.category}</p>
-                      <h3 className="text-xl font-bold text-neutral-100 mb-0">{project.title}</h3>
-                    </div>
-                    {/* Github Icon Link */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent z-10 pointer-events-none"></div>
+
+                {/* Top Badge Info */}
+                <div className="relative z-20 flex justify-between items-center">
+                  <div className="bg-amber-500/10 border border-amber-500/30 px-3 py-1 text-xs font-mono font-bold text-amber-400 backdrop-blur-md rounded-md">
+                    {[
+                      { title: "Admin Dashboard", category: "Web App", desc: "Sistem manajemen tugas & dashboard administrator modern dengan analitik intuitif.", image: "/foto-project/assignment-admindashboard.png", github: "https://github.com/Fardan07/assigment-management" },
+                      { title: "Facility Helpdesk", category: "System", desc: "Digitalisasi pelaporan fasilitas sekolah dengan alur tiket terpadu dan UX interaktif.", image: "/foto-project/weblaporfasilitas.png", github: "https://github.com/Fardan07/project_ukl_sija2" },
+                      { title: "Web Dinamis", category: "Fullstack", desc: "Platform web edukasi & artikel dinamis berbasis PHP & SQL dengan UX copywriting persuasif.", image: "/foto-project/projectwebdinamis.png", github: "https://github.com/Fardan07/web-dinamis-project" },
+                    ][activeProject].category}
+                  </div>
+                  <div className="text-xs font-mono text-neutral-400">
+                    ITEM <span className="text-amber-400 font-bold">0{activeProject + 1}</span> / 03
+                  </div>
+                </div>
+
+                {/* Project Content Bottom */}
+                <div className="relative z-20 mt-16 md:mt-24">
+                  <h3 className="text-2xl md:text-3xl font-bold text-white mb-2 font-mono">
+                    {[
+                      { title: "Admin Dashboard", category: "Web App", desc: "Sistem manajemen tugas & dashboard administrator modern dengan analitik intuitif.", image: "/foto-project/assignment-admindashboard.png", github: "https://github.com/Fardan07/assigment-management" },
+                      { title: "Facility Helpdesk", category: "System", desc: "Digitalisasi pelaporan fasilitas sekolah dengan alur tiket terpadu dan UX interaktif.", image: "/foto-project/weblaporfasilitas.png", github: "https://github.com/Fardan07/project_ukl_sija2" },
+                      { title: "Web Dinamis", category: "Fullstack", desc: "Platform web edukasi & artikel dinamis berbasis PHP & SQL dengan UX copywriting persuasif.", image: "/foto-project/projectwebdinamis.png", github: "https://github.com/Fardan07/web-dinamis-project" },
+                    ][activeProject].title}
+                  </h3>
+                  <p className="text-sm text-neutral-300 font-mono max-w-xl mb-6 leading-relaxed">
+                    {[
+                      { title: "Admin Dashboard", category: "Web App", desc: "Sistem manajemen tugas & dashboard administrator modern dengan analitik intuitif.", image: "/foto-project/assignment-admindashboard.png", github: "https://github.com/Fardan07/assigment-management" },
+                      { title: "Facility Helpdesk", category: "System", desc: "Digitalisasi pelaporan fasilitas sekolah dengan alur tiket terpadu dan UX interaktif.", image: "/foto-project/weblaporfasilitas.png", github: "https://github.com/Fardan07/project_ukl_sija2" },
+                      { title: "Web Dinamis", category: "Fullstack", desc: "Platform web edukasi & artikel dinamis berbasis PHP & SQL dengan UX copywriting persuasif.", image: "/foto-project/projectwebdinamis.png", github: "https://github.com/Fardan07/web-dinamis-project" },
+                    ][activeProject].desc}
+                  </p>
+                  
+                  <div className="flex justify-between items-center pt-4 border-t border-neutral-800/80">
                     <a 
-                      href={project.github} 
+                      href={[
+                        { title: "Admin Dashboard", category: "Web App", desc: "Sistem manajemen tugas & dashboard administrator modern dengan analitik intuitif.", image: "/foto-project/assignment-admindashboard.png", github: "https://github.com/Fardan07/assigment-management" },
+                        { title: "Facility Helpdesk", category: "System", desc: "Digitalisasi pelaporan fasilitas sekolah dengan alur tiket terpadu dan UX interaktif.", image: "/foto-project/weblaporfasilitas.png", github: "https://github.com/Fardan07/project_ukl_sija2" },
+                        { title: "Web Dinamis", category: "Fullstack", desc: "Platform web edukasi & artikel dinamis berbasis PHP & SQL dengan UX copywriting persuasif.", image: "/foto-project/projectwebdinamis.png", github: "https://github.com/Fardan07/web-dinamis-project" },
+                      ][activeProject].github} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className="text-neutral-400 hover:text-amber-400 bg-neutral-900/80 p-2.5 rounded-full border border-neutral-700 hover:border-amber-500 transition-all hover:scale-110"
+                      className="inline-flex items-center gap-2 text-xs font-mono font-bold text-black bg-amber-400 hover:bg-amber-300 px-4 py-2 rounded-full transition-all hover:scale-105 shadow-[0_0_15px_rgba(251,191,36,0.3)]"
                     >
-                      <FaGithub className="w-5 h-5" />
+                      <FaGithub className="w-4 h-4" /> VIEW CODE
                     </a>
+
+                    <div className="text-[10px] font-mono text-amber-500/70 tracking-widest hidden sm:block">
+                      3D_SYSTEM // ROTATED
+                    </div>
                   </div>
-                  <div className="w-8 h-1 bg-amber-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 mt-4 delay-100 relative z-10"></div>
                 </div>
               </motion.div>
-            ))}
+            </AnimatePresence>
+          </div>
+
+          {/* Carousel Controls */}
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-6 max-w-3xl mx-auto">
+            {/* Direct Jump Pills */}
+            <div className="flex flex-wrap gap-2 justify-center">
+              {[
+                { title: "Admin Dashboard" },
+                { title: "Facility Helpdesk" },
+                { title: "Web Dinamis" },
+              ].map((proj, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setProjectDir(idx > activeProject ? 1 : -1);
+                    setActiveProject(idx);
+                  }}
+                  className={`px-3 py-1 text-xs font-mono rounded-full border transition-all ${
+                    idx === activeProject 
+                      ? "bg-amber-500/20 border-amber-500 text-amber-400 font-bold shadow-[0_0_10px_rgba(251,191,36,0.2)]" 
+                      : "border-neutral-800 text-neutral-500 hover:text-neutral-300"
+                  }`}
+                >
+                  0{idx + 1}. {proj.title}
+                </button>
+              ))}
+            </div>
+
+            {/* Prev/Next Buttons */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => {
+                  setProjectDir(-1);
+                  setActiveProject((prev) => (prev - 1 + 3) % 3);
+                }}
+                className="p-3 rounded-full border border-neutral-800 hover:border-amber-500 bg-neutral-900/80 text-neutral-300 hover:text-amber-400 transition-all hover:scale-110 active:scale-95 shadow-md"
+                aria-label="Previous Project"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+
+              <div className="text-xs font-mono text-neutral-400 px-2 font-bold">
+                <span className="text-amber-400">0{activeProject + 1}</span> / 03
+              </div>
+
+              <button
+                onClick={() => {
+                  setProjectDir(1);
+                  setActiveProject((prev) => (prev + 1) % 3);
+                }}
+                className="p-3 rounded-full border border-neutral-800 hover:border-amber-500 bg-neutral-900/80 text-neutral-300 hover:text-amber-400 transition-all hover:scale-110 active:scale-95 shadow-md"
+                aria-label="Next Project"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Certificates Section */}
-      <section id="certificates" className="py-24 px-4 relative z-10 bg-neutral-900/40 border-t border-neutral-800/50">
-        <div className="max-w-6xl mx-auto">
+      <section id="certificates" className="py-24 px-4 relative z-10 bg-neutral-900/40 border-t border-neutral-800/50 overflow-hidden">
+        <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-16 flex flex-col items-center text-center"
+            className="mb-12 flex flex-col items-center text-center"
           >
             <motion.h2 
               initial={{ opacity: 0.1, textShadow: "0 0 0px rgba(251,191,36,0)" }}
@@ -736,48 +832,161 @@ export default function Portfolio() {
             <p className="text-amber-400 font-mono text-sm">ACHIEVEMENTS & VALIDATIONS</p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { title: "DigiUp Certification", image: "/foto-sertifikat/DigiUp Fardan.png", desc: "Sertifikasi keahlian digital Telkom University." },
-              { title: "ElevAlte Event", image: "/foto-sertifikat/ElevAlte - Fardan.png", desc: "Penghargaan partisipasi pada event ElevAlte." },
-              { title: "FicpactCup", image: "/foto-sertifikat/FicpactCup - Fardan.jpeg", desc: "Prestasi dan keikutsertaan kompetisi FicpactCup." },
-              { title: "Sefest", image: "/foto-sertifikat/Sefest - Fardan.png", desc: "Sertifikat penghargaan Sefest Exhibition." },
-            ].map((cert, i) => (
+          {/* 3D Rotating Certificate Carousel Container */}
+          <div className="relative min-h-[360px] md:min-h-[420px] flex items-center justify-center [perspective:1200px]">
+            <AnimatePresence custom={certDir} mode="wait">
               <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                onClick={() => setSelectedCert({ image: cert.image, title: cert.title })}
-                className="group relative aspect-[1.4] rounded-sm overflow-hidden border border-neutral-800 hover:border-amber-500/80 transition-all hover:shadow-[0_0_20px_rgba(251,191,36,0.15)] bg-neutral-950 flex items-center justify-center p-3 cursor-pointer"
+                key={activeCert}
+                custom={certDir}
+                variants={{
+                  enter: (dir: number) => ({
+                    x: dir > 0 ? 160 : -160,
+                    scale: 0.85,
+                    opacity: 0,
+                    filter: "blur(6px)",
+                  }),
+                  center: {
+                    x: 0,
+                    scale: 1,
+                    opacity: 1,
+                    filter: "blur(0px)",
+                    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
+                  },
+                  exit: (dir: number) => ({
+                    x: dir > 0 ? -160 : 160,
+                    scale: 0.85,
+                    opacity: 0,
+                    filter: "blur(6px)",
+                    transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
+                  }),
+                }}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                style={{ transformStyle: "preserve-3d" }}
+                onClick={() => setSelectedCert({ 
+                  image: [
+                    { title: "DigiUp Certification", image: "/foto-sertifikat/DigiUp Fardan.png", desc: "Sertifikasi keahlian digital Telkom University." },
+                    { title: "ElevAlte Event", image: "/foto-sertifikat/ElevAlte - Fardan.png", desc: "Penghargaan partisipasi pada event ElevAlte." },
+                    { title: "FicpactCup", image: "/foto-sertifikat/FicpactCup - Fardan.jpeg", desc: "Prestasi dan keikutsertaan kompetisi FicpactCup." },
+                    { title: "Sefest", image: "/foto-sertifikat/Sefest - Fardan.png", desc: "Sertifikat penghargaan Sefest Exhibition." },
+                  ][activeCert].image, 
+                  title: [
+                    { title: "DigiUp Certification", image: "/foto-sertifikat/DigiUp Fardan.png", desc: "Sertifikasi keahlian digital Telkom University." },
+                    { title: "ElevAlte Event", image: "/foto-sertifikat/ElevAlte - Fardan.png", desc: "Penghargaan partisipasi pada event ElevAlte." },
+                    { title: "FicpactCup", image: "/foto-sertifikat/FicpactCup - Fardan.jpeg", desc: "Prestasi dan keikutsertaan kompetisi FicpactCup." },
+                    { title: "Sefest", image: "/foto-sertifikat/Sefest - Fardan.png", desc: "Sertifikat penghargaan Sefest Exhibition." },
+                  ][activeCert].title 
+                })}
+                className="w-full max-w-3xl aspect-[1.5] relative rounded-xl overflow-hidden border border-amber-500/40 bg-neutral-950 p-4 md:p-8 cursor-pointer group shadow-[0_0_40px_rgba(251,191,36,0.15)] flex items-center justify-center"
               >
                 {/* Cyberpunk corner markers */}
-                <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-amber-500/50 group-hover:border-amber-400 transition-colors z-20"></div>
-                <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-amber-500/50 group-hover:border-amber-400 transition-colors z-20"></div>
-                <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-amber-500/50 group-hover:border-amber-400 transition-colors z-20"></div>
-                <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-amber-500/50 group-hover:border-amber-400 transition-colors z-20"></div>
+                <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-amber-500 group-hover:border-amber-300 transition-colors z-20"></div>
+                <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-amber-500 group-hover:border-amber-300 transition-colors z-20"></div>
+                <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-amber-500 group-hover:border-amber-300 transition-colors z-20"></div>
+                <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-amber-500 group-hover:border-amber-300 transition-colors z-20"></div>
                 
                 {/* Tech label */}
-                <div className="absolute top-2 right-2 bg-amber-500/10 border border-amber-500/30 px-1.5 py-0.5 text-[6px] font-mono text-amber-500 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
-                  VERIFIED
+                <div className="absolute top-3 right-3 bg-amber-500/20 border border-amber-500/40 px-2 py-1 text-[8px] md:text-[10px] font-mono font-bold text-amber-400 z-20 rounded">
+                  VERIFIED // CLICK TO ENLARGE
                 </div>
 
                 <div className="relative w-full h-full z-10">
                   <Image 
-                    src={cert.image} 
-                    alt={cert.title} 
+                    src={[
+                      { title: "DigiUp Certification", image: "/foto-sertifikat/DigiUp Fardan.png", desc: "Sertifikasi keahlian digital Telkom University." },
+                      { title: "ElevAlte Event", image: "/foto-sertifikat/ElevAlte - Fardan.png", desc: "Penghargaan partisipasi pada event ElevAlte." },
+                      { title: "FicpactCup", image: "/foto-sertifikat/FicpactCup - Fardan.jpeg", desc: "Prestasi dan keikutsertaan kompetisi FicpactCup." },
+                      { title: "Sefest", image: "/foto-sertifikat/Sefest - Fardan.png", desc: "Sertifikat penghargaan Sefest Exhibition." },
+                    ][activeCert].image} 
+                    alt={[
+                      { title: "DigiUp Certification", image: "/foto-sertifikat/DigiUp Fardan.png", desc: "Sertifikasi keahlian digital Telkom University." },
+                      { title: "ElevAlte Event", image: "/foto-sertifikat/ElevAlte - Fardan.png", desc: "Penghargaan partisipasi pada event ElevAlte." },
+                      { title: "FicpactCup", image: "/foto-sertifikat/FicpactCup - Fardan.jpeg", desc: "Prestasi dan keikutsertaan kompetisi FicpactCup." },
+                      { title: "Sefest", image: "/foto-sertifikat/Sefest - Fardan.png", desc: "Sertifikat penghargaan Sefest Exhibition." },
+                    ][activeCert].title} 
                     fill 
-                    className="object-contain opacity-70 group-hover:opacity-100 group-hover:scale-[1.03] transition-all duration-500" 
+                    className="object-contain opacity-80 group-hover:opacity-100 group-hover:scale-[1.02] transition-all duration-500" 
                   />
                 </div>
                 
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 z-20">
-                   <h3 className="text-sm md:text-base font-bold text-amber-400 font-mono translate-y-4 group-hover:translate-y-0 transition-transform duration-300">{cert.title}</h3>
-                   <p className="text-[10px] text-neutral-300 font-mono mt-1 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75 border-l-2 border-amber-500 pl-2 leading-tight">{cert.desc}</p>
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 z-20">
+                   <h3 className="text-xl md:text-2xl font-bold text-amber-400 font-mono translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                     {[
+                       { title: "DigiUp Certification", image: "/foto-sertifikat/DigiUp Fardan.png", desc: "Sertifikasi keahlian digital Telkom University." },
+                       { title: "ElevAlte Event", image: "/foto-sertifikat/ElevAlte - Fardan.png", desc: "Penghargaan partisipasi pada event ElevAlte." },
+                       { title: "FicpactCup", image: "/foto-sertifikat/FicpactCup - Fardan.jpeg", desc: "Prestasi dan keikutsertaan kompetisi FicpactCup." },
+                       { title: "Sefest", image: "/foto-sertifikat/Sefest - Fardan.png", desc: "Sertifikat penghargaan Sefest Exhibition." },
+                     ][activeCert].title}
+                   </h3>
+                   <p className="text-xs text-neutral-200 font-mono mt-1 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75 border-l-2 border-amber-500 pl-2 leading-relaxed">
+                     {[
+                       { title: "DigiUp Certification", image: "/foto-sertifikat/DigiUp Fardan.png", desc: "Sertifikasi keahlian digital Telkom University." },
+                       { title: "ElevAlte Event", image: "/foto-sertifikat/ElevAlte - Fardan.png", desc: "Penghargaan partisipasi pada event ElevAlte." },
+                       { title: "FicpactCup", image: "/foto-sertifikat/FicpactCup - Fardan.jpeg", desc: "Prestasi dan keikutsertaan kompetisi FicpactCup." },
+                       { title: "Sefest", image: "/foto-sertifikat/Sefest - Fardan.png", desc: "Sertifikat penghargaan Sefest Exhibition." },
+                     ][activeCert].desc}
+                   </p>
                 </div>
               </motion.div>
-            ))}
+            </AnimatePresence>
+          </div>
+
+          {/* Carousel Controls */}
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-6 max-w-3xl mx-auto">
+            {/* Direct Jump Pills */}
+            <div className="flex flex-wrap gap-2 justify-center">
+              {[
+                { title: "DigiUp" },
+                { title: "ElevAlte" },
+                { title: "FicpactCup" },
+                { title: "Sefest" },
+              ].map((cert, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setCertDir(idx > activeCert ? 1 : -1);
+                    setActiveCert(idx);
+                  }}
+                  className={`px-3 py-1 text-xs font-mono rounded-full border transition-all ${
+                    idx === activeCert 
+                      ? "bg-amber-500/20 border-amber-500 text-amber-400 font-bold shadow-[0_0_10px_rgba(251,191,36,0.2)]" 
+                      : "border-neutral-800 text-neutral-500 hover:text-neutral-300"
+                  }`}
+                >
+                  0{idx + 1}. {cert.title}
+                </button>
+              ))}
+            </div>
+
+            {/* Prev/Next Buttons */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => {
+                  setCertDir(-1);
+                  setActiveCert((prev) => (prev - 1 + 4) % 4);
+                }}
+                className="p-3 rounded-full border border-neutral-800 hover:border-amber-500 bg-neutral-900/80 text-neutral-300 hover:text-amber-400 transition-all hover:scale-110 active:scale-95 shadow-md"
+                aria-label="Previous Certificate"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+
+              <div className="text-xs font-mono text-neutral-400 px-2 font-bold">
+                <span className="text-amber-400">0{activeCert + 1}</span> / 04
+              </div>
+
+              <button
+                onClick={() => {
+                  setCertDir(1);
+                  setActiveCert((prev) => (prev + 1) % 4);
+                }}
+                className="p-3 rounded-full border border-neutral-800 hover:border-amber-500 bg-neutral-900/80 text-neutral-300 hover:text-amber-400 transition-all hover:scale-110 active:scale-95 shadow-md"
+                aria-label="Next Certificate"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -790,19 +999,8 @@ export default function Portfolio() {
             viewport={{ once: true }}
             className="flex flex-col md:flex-row justify-between items-center md:items-start gap-12"
           >
-            {/* Left Brand */}
-            <div className="text-center md:text-left">
-              <p className="text-neutral-400 font-mono text-sm max-w-xs mb-6 mx-auto md:mx-0">
-                Membangun pengalaman digital dengan fokus pada desain UI/UX yang modern dan estetika tingkat tinggi.
-              </p>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-400 text-xs font-mono font-bold">
-                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                AVAILABLE FOR HIRE
-              </div>
-            </div>
-
-            {/* Right Links */}
-            <div className="flex flex-col sm:flex-row gap-12 text-center sm:text-left">
+            {/* Socials & Contact Links */}
+            <div className="flex flex-col sm:flex-row gap-12 text-center sm:text-left w-full justify-between">
               <div>
                 <h4 className="text-white font-bold mb-4 font-mono">SOCIALS</h4>
                 <div className="flex flex-col gap-2 text-sm text-neutral-400">
