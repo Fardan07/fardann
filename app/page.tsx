@@ -9,7 +9,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Briefcase,
-  GraduationCap
+  GraduationCap,
+  Maximize2
 } from "lucide-react";
 import { 
   FaLinkedin, 
@@ -21,8 +22,7 @@ import {
   FaGithub,
   FaFigma,
   FaPhp,
-  FaPython,
-  FaJava
+  FaPython
 } from "react-icons/fa";
 import { 
   SiNextdotjs, 
@@ -58,6 +58,85 @@ const Typewriter = ({ text, speed = 30, delay = 0 }: { text: string, speed?: num
   }, [text, speed, start]);
 
   return <span>{displayedText}<motion.span animate={{ opacity: [1, 0] }} transition={{ repeat: Infinity, duration: 0.8 }} className="inline-block w-2 h-4 ml-1 bg-amber-400 align-middle"/></span>;
+};
+
+// Multilingual Greeting with Typewriter & Backspace effect
+const MULTILINGUAL_GREETINGS = [
+  "Hello",
+  "Hola",
+  "Bonjour",
+  "Halo",
+  "Konnichiwa",
+  "Guten Tag",
+  "Ciao",
+  "Annyeong",
+  "Olá",
+  "Nǐ Hǎo",
+  "Namaste",
+];
+
+const MultilingualGreeting = () => {
+  const [index, setIndex] = useState(0);
+  const [displayedText, setDisplayedText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+
+  // Initial delay so user sees "Hello" typed right after loading screen opens
+  useEffect(() => {
+    const startTimeout = setTimeout(() => {
+      setIsReady(true);
+    }, 2000);
+    return () => clearTimeout(startTimeout);
+  }, []);
+
+  useEffect(() => {
+    if (!isReady) return;
+
+    const currentWord = MULTILINGUAL_GREETINGS[index];
+    let timer: NodeJS.Timeout;
+
+    if (!isDeleting) {
+      // Typing phase: type letter by letter
+      if (displayedText.length < currentWord.length) {
+        timer = setTimeout(() => {
+          setDisplayedText(currentWord.slice(0, displayedText.length + 1));
+        }, 120);
+      } else {
+        // Full word typed: pause so it can be read, then start backspacing
+        timer = setTimeout(() => {
+          setIsDeleting(true);
+        }, 2000);
+      }
+    } else {
+      // Deleting phase: backspace letter by letter
+      if (displayedText.length > 0) {
+        timer = setTimeout(() => {
+          setDisplayedText(currentWord.slice(0, displayedText.length - 1));
+        }, 60);
+      } else {
+        // Fully backspaced: short pause, then move to next word and start typing
+        timer = setTimeout(() => {
+          setIsDeleting(false);
+          setIndex((prev) => (prev + 1) % MULTILINGUAL_GREETINGS.length);
+        }, 350);
+      }
+    }
+
+    return () => clearTimeout(timer);
+  }, [displayedText, isDeleting, index, isReady]);
+
+  return (
+    <span className="inline-flex items-center min-w-[20px]">
+      <span className="text-amber-400 font-bold drop-shadow-[0_0_10px_rgba(251,191,36,0.4)]">
+        {displayedText}
+      </span>
+      <motion.span
+        animate={{ opacity: [1, 0] }}
+        transition={{ repeat: Infinity, duration: 0.6, ease: "easeInOut" }}
+        className="inline-block w-[2px] h-[1.1em] bg-amber-400 ml-1 rounded-sm shadow-[0_0_8px_rgba(251,191,36,0.8)] align-middle"
+      />
+    </span>
+  );
 };
 
 // Animated Number Counter
@@ -211,12 +290,69 @@ const ScreenPowerOn = () => {
   );
 };
 
+const projectsData = [
+  {
+    title: "Admin Dashboard",
+    category: "Web Application",
+    year: "2025",
+    desc: "Sistem dashboard administrator & manajemen tugas dengan analitik terstruktur dan kontrol akses intuitif.",
+    tech: ["HTML5", "Tailwind CSS", "JavaScript", "REST API"],
+    image: "/foto-project/assignment-admindashboard.png",
+    github: "https://github.com/Fardan07/assigment-management",
+  },
+  {
+    title: "Facility Helpdesk",
+    category: "Internal System",
+    year: "2026",
+    desc: "Platform digitalisasi pelaporan dan tiket fasilitas sekolah dengan status penanganan real-time.",
+    tech: ["PHP", "MySQL", "Bootstrap", "JavaScript"],
+    image: "/foto-project/weblaporfasilitas.png",
+    github: "https://github.com/Fardan07/project_ukl_sija2",
+  },
+  {
+    title: "Web Dinamis Edukasi",
+    category: "Fullstack Platform",
+    year: "2025",
+    desc: "Website edukasi lingkungan interaktif berbasis PHP dan SQL dengan pengelolaan konten dinamis.",
+    tech: ["HTML/CSS", "PHP", "MySQL", "UX Copy"],
+    image: "/foto-project/projectwebdinamis.png",
+    github: "https://github.com/Fardan07/web-dinamis-project",
+  }
+];
+
+const certificatesData = [
+  {
+    title: "DigiUp Certification",
+    issuer: "Telkom University",
+    year: "2025",
+    category: "Validasi Keterampilan Digital",
+    image: "/foto-sertifikat/DigiUp Fardan.png",
+  },
+  {
+    title: "ElevAlte Event",
+    issuer: "ElevAlte Exhibition",
+    year: "2025",
+    category: "Acara & Workshop Teknologi",
+    image: "/foto-sertifikat/ElevAlte - Fardan.png",
+  },
+  {
+    title: "FicpactCup Competition",
+    issuer: "Ficpact Tech Committee",
+    year: "2025",
+    category: "Kompetisi Kejuruan",
+    image: "/foto-sertifikat/FicpactCup - Fardan.jpeg",
+  },
+  {
+    title: "Sefest Exhibition",
+    issuer: "Sefest Organization",
+    year: "2025",
+    category: "Pameran Proyek & Expo",
+    image: "/foto-sertifikat/Sefest - Fardan.png",
+  }
+];
+
 export default function Portfolio() {
   const [selectedCert, setSelectedCert] = useState<{image: string, title: string} | null>(null);
-  const [activeProject, setActiveProject] = useState(0);
-  const [projectDir, setProjectDir] = useState<number>(1);
-  const [activeCert, setActiveCert] = useState(0);
-  const [certDir, setCertDir] = useState<number>(1);
 
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
@@ -242,66 +378,74 @@ export default function Portfolio() {
     },
   };
 
-  const nameControls = useAnimation();
+  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    e.preventDefault();
+    const target = document.querySelector(targetId);
+    if (!target) return;
 
-  useEffect(() => {
-    const sequence = async () => {
-      // 1. Startup flicker (broken light trying to turn on)
-      await nameControls.start({
-        opacity: [0.1, 0.1, 0.8, 0.1, 0.9, 0.2, 1],
-        textShadow: [
-          "0 0 0px rgba(251,191,36,0)",
-          "0 0 0px rgba(251,191,36,0)",
-          "0 0 20px rgba(251,191,36,0.8)",
-          "0 0 0px rgba(251,191,36,0)",
-          "0 0 25px rgba(251,191,36,1)",
-          "0 0 5px rgba(251,191,36,0.2)",
-          "0 0 40px rgba(251,191,36,1)"
-        ],
-        transition: { duration: 2, times: [0, 0.5, 0.6, 0.7, 0.8, 0.9, 1], ease: "linear", delay: 0.5 }
+    if (typeof window !== "undefined" && (window as any).lenis) {
+      (window as any).lenis.scrollTo(target, {
+        offset: -40,
+        duration: 1.4,
+        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       });
-      // 2. Infinite random occasional flickers (like a dying light)
-      nameControls.start({
-        opacity: [1, 1, 0.5, 0.9, 0.3, 1, 1, 1, 0.6, 1, 1],
-        textShadow: [
-          "0 0 40px rgba(251,191,36,1)",
-          "0 0 40px rgba(251,191,36,1)",
-          "0 0 15px rgba(251,191,36,0.5)",
-          "0 0 35px rgba(251,191,36,0.9)",
-          "0 0 10px rgba(251,191,36,0.3)",
-          "0 0 40px rgba(251,191,36,1)",
-          "0 0 40px rgba(251,191,36,1)",
-          "0 0 40px rgba(251,191,36,1)",
-          "0 0 20px rgba(251,191,36,0.6)",
-          "0 0 40px rgba(251,191,36,1)",
-          "0 0 40px rgba(251,191,36,1)"
-        ],
-        transition: {
-          duration: 10,
-          times: [0, 0.4, 0.41, 0.43, 0.45, 0.47, 0.5, 0.8, 0.82, 0.84, 1],
-          ease: "linear",
-          repeat: Infinity
-        }
+    } else {
+      const top = target.getBoundingClientRect().top + window.scrollY - 60;
+      window.scrollTo({
+        top,
+        behavior: "smooth",
       });
-    };
-    sequence();
-  }, [nameControls]);
-
+    }
+  };
 
   return (
     <main className="min-h-screen relative bg-transparent text-slate-50 selection:bg-amber-500 selection:text-black overflow-hidden">
+      <div className="crt-scanlines" />
       <ScreenPowerOn />
       <FloatingParticles />
       
-      {/* Navbar / Top Menu */}
-      <nav className="fixed w-full top-0 z-50 px-2 sm:px-6 py-4 flex justify-center items-center backdrop-blur-md bg-[#0a0a0a]/80 border-b border-neutral-800/50 shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
-        <div className="flex flex-wrap justify-center gap-4 sm:gap-10 text-[10px] sm:text-xs font-mono tracking-widest text-slate-300">
-          <a href="#about" className="hover:text-amber-400 transition-colors font-bold">START</a>
-          <a href="#skills" className="hover:text-amber-400 transition-colors font-bold">OPTIONS</a>
-          <a href="#projects" className="hover:text-amber-400 transition-colors font-bold">PROJECTS</a>
-          <a href="#contact" className="hover:text-amber-400 transition-colors font-bold">EXIT</a>
-        </div>
-      </nav>
+      {/* Floating High-Contrast Retro-Industrial Navbar */}
+      <header className="fixed top-5 sm:top-6 inset-x-0 z-50 flex justify-center items-center pointer-events-none px-4">
+        <nav className="pointer-events-auto flex items-center px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-[#121214]/95 backdrop-blur-xl border border-neutral-700 hover:border-amber-500/40 shadow-[0_10px_35px_rgba(0,0,0,0.9),0_0_20px_rgba(251,191,36,0.12)] transition-colors">
+          <div className="flex items-center gap-1 sm:gap-3 text-[11px] sm:text-xs font-mono tracking-widest text-slate-200">
+            <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-neutral-900 border border-neutral-800 text-[10px] text-neutral-300 font-mono tracking-wider mr-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_#34d399]" />
+              SYS.ONLINE
+            </span>
+            <a 
+              href="#about" 
+              onClick={(e) => scrollToSection(e, "#about")}
+              className="px-3 py-1 rounded-full hover:text-amber-400 hover:bg-amber-400/10 transition-all font-bold cursor-pointer"
+            >
+              START
+            </a>
+            <span className="text-amber-500/40 select-none text-[10px]">•</span>
+            <a 
+              href="#skills" 
+              onClick={(e) => scrollToSection(e, "#skills")}
+              className="px-3 py-1 rounded-full hover:text-amber-400 hover:bg-amber-400/10 transition-all font-bold cursor-pointer"
+            >
+              OPTIONS
+            </a>
+            <span className="text-amber-500/40 select-none text-[10px]">•</span>
+            <a 
+              href="#projects" 
+              onClick={(e) => scrollToSection(e, "#projects")}
+              className="px-3 py-1 rounded-full hover:text-amber-400 hover:bg-amber-400/10 transition-all font-bold cursor-pointer"
+            >
+              PROJECTS
+            </a>
+            <span className="text-amber-500/40 select-none text-[10px]">•</span>
+            <a 
+              href="#contact" 
+              onClick={(e) => scrollToSection(e, "#contact")}
+              className="px-3 py-1 rounded-full hover:text-amber-400 hover:bg-amber-400/10 transition-all font-bold cursor-pointer"
+            >
+              EXIT
+            </a>
+          </div>
+        </nav>
+      </header>
 
       {/* Hero Section */}
       <section id="about" className="min-h-screen flex flex-col justify-center items-center px-4 pt-24 pb-12 relative z-10">
@@ -313,24 +457,21 @@ export default function Portfolio() {
         >
           {/* Text Content */}
           <div className="flex-1 text-center lg:text-left">
-            <motion.h1 variants={titleVariants} className="text-huge font-extrabold mb-2 uppercase">
-              PORTFOLIO <br className="hidden lg:block"/>
-              <span className="text-stroke">2026</span>
-            </motion.h1>
+            {/* Animated Multilingual Greeting */}
+            <motion.div variants={itemVariants} className="text-amber-400 font-mono tracking-[0.2em] text-base sm:text-lg md:text-xl font-bold mb-3 uppercase flex items-center justify-center lg:justify-start">
+              <MultilingualGreeting />
+              <span className="ml-1.5 text-neutral-300">, I AM</span>
+            </motion.div>
+
+            {/* Main Name Title in Plain Clean Full Capital without animation */}
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold mb-6 uppercase tracking-tight text-white leading-[1.05]">
+              MUHAMMAD FARDAN
+            </h1>
             
-            <div className="mt-8">
-              <motion.h2 variants={itemVariants} className="text-amber-400 font-mono tracking-[0.2em] text-sm mb-2 uppercase">
-                Hello, I Am
-              </motion.h2>
-              {/* Glitch Name Effect */}
-              <h3 className="text-3xl md:text-5xl font-bold mb-6">
-                <span className="glitch-text-effect" data-text="Muhammad Fardan">
-                  Muhammad Fardan
-                </span>
-              </h3>
+            <div>
               <motion.p variants={itemVariants} className="text-neutral-400 text-sm md:text-base leading-relaxed max-w-xl mx-auto lg:mx-0 min-h-[100px]">
                 <Typewriter 
-                  text="Hi, I'm Muhammad Fardan. I'm building a portfolio at the end of the year. I learned a lot of things from web development, UI/UX design, and database management. I learned mostly autodidact, and I have skills that I learn from year to year." 
+                  text="Halo, saya Muhammad Fardan. Saya mempelajari banyak hal mulai dari web development, desain UI/UX, hingga manajemen basis data. Sebagian besar saya pelajari secara otodidak dan terus mengembangkan keterampilan saya dari tahun ke tahun." 
                   delay={1000} 
                   speed={25} 
                 />
@@ -456,9 +597,11 @@ export default function Portfolio() {
           >
             {/* Left Column: Software Skills */}
             <div>
-              <h3 className="text-xl font-bold mb-8 flex items-center gap-2">
-                <span className="w-8 h-1 bg-amber-500 rounded"></span> SOFTWARE SKILLS
-              </h3>
+              <div className="mb-8">
+                <h3 className="text-xl font-bold flex items-center gap-2 font-mono">
+                  <span className="w-8 h-1 bg-amber-500 rounded"></span> SOFTWARE SKILLS
+                </h3>
+              </div>
               <div className="grid grid-cols-4 sm:grid-cols-5 gap-4">
                 {[
                   { icon: <FaHtml5 className="w-7 h-7 text-neutral-300 group-hover:text-orange-500 transition-colors" />, name: "HTML" },
@@ -467,7 +610,6 @@ export default function Portfolio() {
                   { icon: <FaPhp className="w-7 h-7 text-neutral-300 group-hover:text-indigo-400 transition-colors" />, name: "PHP" },
                   { icon: <SiTypescript className="w-7 h-7 text-neutral-300 group-hover:text-blue-400 transition-colors" />, name: "TS" },
                   { icon: <FaPython className="w-7 h-7 text-neutral-300 group-hover:text-yellow-300 transition-colors" />, name: "Python" },
-                  { icon: <FaJava className="w-7 h-7 text-neutral-300 group-hover:text-red-500 transition-colors" />, name: "Java" },
                   { icon: <SiMysql className="w-7 h-7 text-neutral-300 group-hover:text-blue-400 transition-colors" />, name: "MySQL" },
                   { icon: <FaReact className="w-7 h-7 text-neutral-300 group-hover:text-sky-400 transition-colors" />, name: "React" },
                   { icon: <SiNextdotjs className="w-7 h-7 text-neutral-300 group-hover:text-white transition-colors" />, name: "Next.js" },
@@ -485,7 +627,7 @@ export default function Portfolio() {
                     className="glass p-3 aspect-square rounded-xl flex items-center justify-center group hover:bg-neutral-800 transition-colors cursor-help relative border border-neutral-700 hover:border-amber-500/50 hover:-translate-y-2 hover:shadow-[0_10px_20px_rgba(251,191,36,0.15)]"
                   >
                     {skill.icon}
-                    <span className="absolute -top-10 bg-neutral-800 text-amber-400 border border-amber-500/30 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
+                    <span className="absolute -top-10 bg-neutral-800 text-amber-400 border border-amber-500/30 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none font-mono">
                       {skill.name}
                     </span>
                   </motion.div>
@@ -495,13 +637,15 @@ export default function Portfolio() {
 
             {/* Right Column: Language */}
             <div>
-              <h3 className="text-xl font-bold mb-8 flex items-center gap-2">
-                <span className="w-8 h-1 bg-neutral-400 rounded"></span> LANGUAGE
-              </h3>
+              <div className="mb-8">
+                <h3 className="text-xl font-bold flex items-center gap-2 font-mono">
+                  <span className="w-8 h-1 bg-neutral-400 rounded"></span> BAHASA
+                </h3>
+              </div>
               <div className="space-y-8 glass p-8 rounded-2xl border border-neutral-800/50">
                 {[
-                  { name: "INDONESIA", percent: "95%" },
-                  { name: "ENGLISH", percent: "75%" },
+                  { name: "BAHASA INDONESIA", percent: "95%" },
+                  { name: "BAHASA INGGRIS", percent: "75%" },
                 ].map((lang, i) => (
                   <div key={i}>
                     <div className="flex justify-between text-sm font-mono mb-3 text-neutral-400">
@@ -527,95 +671,145 @@ export default function Portfolio() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-16"
+            className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14"
           >
             {/* Left Column: Education */}
-            <div>
-              <h3 className="text-xl font-bold mb-8 flex items-center gap-2">
-                <span className="w-8 h-1 bg-amber-600 rounded"></span> EDUCATION
-              </h3>
-              <div className="relative ml-4 space-y-10 pb-4">
-                {/* Background Line */}
-                <div className="absolute left-0 top-2 bottom-0 w-[1px] bg-neutral-700/80" />
-                {/* Animated Progress Line (SD to SMK) */}
-                <motion.div 
-                  className="absolute left-0 bottom-0 w-[1px] bg-gradient-to-t from-yellow-400 via-amber-500 to-amber-600 origin-bottom"
-                  initial={{ scaleY: 0 }}
-                  whileInView={{ scaleY: 1 }}
-                  transition={{ duration: 1.5, ease: "easeInOut" }}
-                  viewport={{ once: true }}
-                  style={{ height: "100%" }}
-                />
-                
-                <motion.div 
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 1.0 }}
-                  className="relative pl-8 group"
-                >
-                  <span className="absolute -left-[5px] top-1 w-2.5 h-2.5 rounded-full bg-amber-600 shadow-[0_0_10px_#d97706] group-hover:scale-150 transition-transform"></span>
-                  <p className="text-amber-600 text-xs font-mono mb-1 font-bold">SMK</p>
-                  <h4 className="text-lg font-bold text-neutral-100 group-hover:text-amber-400 transition-colors">SMK TELKOM SIDOARJO</h4>
-                </motion.div>
+            <div className="flex flex-col">
+              <div className="mb-6">
+                <h3 className="text-xl font-bold flex items-center gap-2 font-mono">
+                  <span className="w-8 h-1 bg-amber-500 rounded"></span> PENDIDIKAN
+                </h3>
+              </div>
 
-                <motion.div 
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.5 }}
-                  className="relative pl-8 group"
-                >
-                  <span className="absolute -left-[5px] top-1 w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_10px_#f59e0b] group-hover:scale-150 transition-transform"></span>
-                  <p className="text-amber-500 text-xs font-mono mb-1 font-bold">SMP</p>
-                  <h4 className="text-lg font-bold text-neutral-100 group-hover:text-amber-400 transition-colors">SMPN 1 BUDURAN</h4>
-                </motion.div>
+              {/* Retro Institution Spec Card */}
+              <div className="relative rounded-2xl bg-neutral-950/90 border border-neutral-800/90 p-6 md:p-7 hover:border-amber-500/40 transition-all duration-300 shadow-xl flex flex-col justify-between flex-1 group">
+                {/* Corner markers */}
+                <div className="absolute top-0 left-0 w-3.5 h-3.5 border-t-2 border-l-2 border-amber-500/70 group-hover:border-amber-400 transition-colors"></div>
+                <div className="absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 border-amber-500/70 group-hover:border-amber-400 transition-colors"></div>
+                <div className="absolute bottom-0 left-0 w-3.5 h-3.5 border-b-2 border-l-2 border-amber-500/70 group-hover:border-amber-400 transition-colors"></div>
+                <div className="absolute bottom-0 right-0 w-3.5 h-3.5 border-b-2 border-r-2 border-amber-500/70 group-hover:border-amber-400 transition-colors"></div>
 
-                <motion.div 
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0 }}
-                  className="relative pl-8 group"
-                >
-                  <span className="absolute -left-[5px] top-1 w-2.5 h-2.5 rounded-full bg-yellow-400 shadow-[0_0_10px_#facc15] group-hover:scale-150 transition-transform"></span>
-                  <p className="text-yellow-400 text-xs font-mono mb-1 font-bold">SD</p>
-                  <h4 className="text-lg font-bold text-neutral-100 group-hover:text-amber-400 transition-colors">MI ANNAHDLIYIN</h4>
-                </motion.div>
+                <div>
+                  <div className="flex items-center justify-between mb-3 text-xs font-mono">
+                    <span className="text-amber-500 font-bold tracking-widest flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shadow-[0_0_8px_#fbbf24]"></span>
+                      SEKOLAH MENENGAH KEJURUAN
+                    </span>
+                    <span className="text-neutral-500">2023 &mdash; 2027</span>
+                  </div>
+
+                  <h4 className="text-2xl font-black text-white group-hover:text-amber-400 transition-colors mb-2 font-mono">
+                    SMK TELKOM SIDOARJO
+                  </h4>
+
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-mono font-bold mb-4">
+                    <span>JURUSAN: SIJA</span>
+                  </div>
+
+                  {/* 1-sentence clean summary */}
+                  <p className="text-xs sm:text-sm text-neutral-400 mb-6 leading-relaxed">
+                    Sistem Informatika, Jaringan, dan Aplikasi &mdash; Program kejuruan 4 tahun berbasis integrasi software, jaringan komputer, dan sistem server.
+                  </p>
+
+                  {/* 4 Clean Compact Retro Tags Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 font-mono text-xs">
+                    <div className="p-2.5 rounded-lg bg-neutral-900/80 border border-neutral-800 text-neutral-300 flex items-center gap-2">
+                      <span className="text-amber-400 font-bold">[01]</span>
+                      <span>Web & Software Dev</span>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-neutral-900/80 border border-neutral-800 text-neutral-300 flex items-center gap-2">
+                      <span className="text-amber-400 font-bold">[02]</span>
+                      <span>Network Engineering</span>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-neutral-900/80 border border-neutral-800 text-neutral-300 flex items-center gap-2">
+                      <span className="text-amber-400 font-bold">[03]</span>
+                      <span>Linux & SysAdmin</span>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-neutral-900/80 border border-neutral-800 text-neutral-300 flex items-center gap-2">
+                      <span className="text-amber-400 font-bold">[04]</span>
+                      <span>IoT Integration</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom Metadata Log */}
+                <div className="mt-6 pt-3 border-t border-neutral-800/80 flex items-center justify-between text-[10px] font-mono text-neutral-500">
+                  <span>LOC: SIDOARJO, ID</span>
+                  <span className="text-amber-500/80">TELKOM SCHOOLS</span>
+                </div>
               </div>
             </div>
 
             {/* Right Column: Work Experience */}
             <div>
-              <h3 className="text-xl font-bold mb-8 flex items-center gap-2">
-                <span className="w-8 h-1 bg-yellow-500 rounded"></span> WORK EXPERIENCE
-              </h3>
-              <div className="relative border-l border-neutral-700/80 ml-4 space-y-10 pb-4">
-                <div className="relative pl-8 group">
-                  <span className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-yellow-600 shadow-[0_0_10px_#ca8a04] group-hover:scale-150 transition-transform"></span>
-                  <p className="text-yellow-600 text-xs font-mono mb-1 font-bold">Juni 2025</p>
-                  <h4 className="text-lg font-bold text-neutral-100 mb-2 group-hover:text-amber-400 transition-colors">Proyek Ujian Kenaikan Kelas</h4>
-                  <p className="text-sm text-neutral-400 leading-relaxed text-justify">
-                    Mengembangkan website berbasis edukasi, merancang tata letak, alur informasi, dan UX copywriting persuasif untuk platform edukasi lingkungan (artikel, jurnal, dan e-book). Menggunakan HTML, CSS, PHP, dan SQL sebagai sistem pengelolaan data.
+              <div className="mb-6">
+                <h3 className="text-xl font-bold flex items-center gap-2 font-mono">
+                  <span className="w-8 h-1 bg-amber-500 rounded"></span> PENGALAMAN KERJA
+                </h3>
+              </div>
+
+              <div className="relative border-l border-neutral-800 ml-3 space-y-6 pb-2">
+                <div className="relative pl-6 group">
+                  <span className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_10px_#f59e0b] group-hover:scale-150 transition-transform"></span>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-amber-500 text-xs font-mono font-bold">[EXP_01]</span>
+                    <span className="text-neutral-500 text-xs font-mono">Juni 2025</span>
+                  </div>
+                  <h4 className="text-base sm:text-lg font-bold text-neutral-100 mb-1 group-hover:text-amber-400 transition-colors">
+                    Proyek Ujian Kenaikan Kelas (UKK)
+                  </h4>
+                  <p className="text-xs text-neutral-400 leading-relaxed mb-2">
+                    Pengembangan website edukasi lingkungan interaktif berbasis HTML, PHP, dan SQL.
                   </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {["HTML/CSS", "PHP", "MySQL", "UX Copy"].map((tag, tIdx) => (
+                      <span key={tIdx} className="text-[10px] font-mono bg-neutral-900 text-neutral-400 border border-neutral-800 px-2 py-0.5 rounded">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
                 
-                <div className="relative pl-8 group">
-                  <span className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-yellow-500 shadow-[0_0_10px_#eab308] group-hover:scale-150 transition-transform"></span>
-                  <p className="text-yellow-500 text-xs font-mono mb-1 font-bold">Mei 2026</p>
-                  <h4 className="text-lg font-bold text-neutral-100 mb-2 group-hover:text-amber-400 transition-colors">Proyek Ujian Digital Talent Program</h4>
-                  <p className="text-sm text-neutral-400 leading-relaxed text-justify">
-                    Merancang alur sistem, antarmuka, dan UX Copy pada aplikasi web Facility Helpdesk untuk mendigitalisasi pelaporan fasilitas sekolah, serta mempresentasikan progres proyek langsung di hadapan manajemen industri.
+                <div className="relative pl-6 group">
+                  <span className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_10px_#f59e0b] group-hover:scale-150 transition-transform"></span>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-amber-500 text-xs font-mono font-bold">[EXP_02]</span>
+                    <span className="text-neutral-500 text-xs font-mono">Mei 2026</span>
+                  </div>
+                  <h4 className="text-base sm:text-lg font-bold text-neutral-100 mb-1 group-hover:text-amber-400 transition-colors">
+                    Proyek Digital Talent Program
+                  </h4>
+                  <p className="text-xs text-neutral-400 leading-relaxed mb-2">
+                    Perancangan antarmuka dan alur sistem web Facility Helpdesk untuk pelaporan fasilitas sekolah.
                   </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {["Facility Helpdesk", "System Flow", "UI/UX"].map((tag, tIdx) => (
+                      <span key={tIdx} className="text-[10px] font-mono bg-neutral-900 text-neutral-400 border border-neutral-800 px-2 py-0.5 rounded">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
                 
-                <div className="relative pl-8 group">
+                <div className="relative pl-6 group">
                   <span className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_10px_#fbbf24] group-hover:scale-150 transition-transform"></span>
-                  <p className="text-amber-400 text-xs font-mono mb-1 font-bold">2026</p>
-                  <h4 className="text-lg font-bold text-neutral-100 mb-2 group-hover:text-amber-400 transition-colors">Proyek Proposal & Pitch Deck</h4>
-                  <p className="text-sm text-neutral-400 leading-relaxed text-justify">
-                    Merancang struktur narasi problem-solution, value proposition, dan materi presentasi pitch deck untuk platform prediksi karir berbasis AI.
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-amber-400 text-xs font-mono font-bold">[EXP_03]</span>
+                    <span className="text-neutral-400 text-xs font-mono">2026</span>
+                  </div>
+                  <h4 className="text-base sm:text-lg font-bold text-neutral-100 mb-1 group-hover:text-amber-400 transition-colors">
+                    Proyek Proposal & Pitch Deck
+                  </h4>
+                  <p className="text-xs text-neutral-400 leading-relaxed mb-2">
+                    Penyusunan narasi problem-solution dan materi pitch deck untuk platform prediksi karir AI.
                   </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {["Pitch Deck", "Value Proposition", "AI Concept"].map((tag, tIdx) => (
+                      <span key={tIdx} className="text-[10px] font-mono bg-neutral-900 text-neutral-400 border border-neutral-800 px-2 py-0.5 rounded">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -624,375 +818,197 @@ export default function Portfolio() {
       </section>
 
       {/* Projects Section */}
-      <section id="projects" className="py-24 px-4 relative z-10 overflow-hidden">
-        <div className="max-w-5xl mx-auto">
+      <section id="projects" className="py-24 px-4 relative z-10">
+        <div className="max-w-6xl mx-auto">
+          {/* Section Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-12 flex flex-col items-center text-center"
+            className="mb-14 text-center"
           >
-            <motion.h2 
-              initial={{ opacity: 0.1, textShadow: "0 0 0px rgba(251,191,36,0)" }}
-              animate={nameControls}
-              className="text-4xl md:text-5xl font-black uppercase tracking-tight mb-2 text-amber-50"
-            >
-              RECAP PROJECT 2026
-            </motion.h2>
-            <p className="text-amber-400 font-mono text-sm">NON AI / REAL CODE</p>
+            <span className="text-xs font-mono text-amber-400 tracking-[0.2em] uppercase font-bold mb-2 block">
+              KARYA PILIHAN
+            </span>
+            <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tight text-amber-50">
+              PROYEK
+            </h2>
           </motion.div>
 
-          {/* 3D Rotating Project Carousel Container */}
-          <div className="relative min-h-[440px] md:min-h-[460px] flex items-center justify-center [perspective:1200px]">
-            <AnimatePresence custom={projectDir} mode="wait">
+          {/* 3-Column Minimalist Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+            {projectsData.map((project, idx) => (
               <motion.div
-                key={activeProject}
-                custom={projectDir}
-                variants={{
-                  enter: (dir: number) => ({
-                    x: dir > 0 ? 160 : -160,
-                    scale: 0.85,
-                    opacity: 0,
-                    filter: "blur(6px)",
-                  }),
-                  center: {
-                    x: 0,
-                    scale: 1,
-                    opacity: 1,
-                    filter: "blur(0px)",
-                    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
-                  },
-                  exit: (dir: number) => ({
-                    x: dir > 0 ? -160 : 160,
-                    scale: 0.85,
-                    opacity: 0,
-                    filter: "blur(6px)",
-                    transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
-                  }),
-                }}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                style={{ transformStyle: "preserve-3d" }}
-                className="w-full max-w-3xl relative rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-950/90 shadow-[0_0_40px_rgba(251,191,36,0.12)] p-6 md:p-10 flex flex-col justify-between min-h-[380px] md:min-h-[420px]"
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                className="rounded-2xl bg-neutral-950/70 border border-neutral-800 hover:border-amber-500/40 transition-all duration-300 overflow-hidden flex flex-col group hover:-translate-y-1.5 shadow-lg"
               >
-                {/* Cyberpunk corner markers */}
-                <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-amber-500/70 z-20"></div>
-                <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-amber-500/70 z-20"></div>
-                <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-amber-500/70 z-20"></div>
-                <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-amber-500/70 z-20"></div>
-
-                {/* Project Image Background */}
-                <Image 
-                  src={[
-                    { title: "Admin Dashboard", category: "Web App", desc: "Sistem manajemen tugas & dashboard administrator modern dengan analitik intuitif.", image: "/foto-project/assignment-admindashboard.png", github: "https://github.com/Fardan07/assigment-management" },
-                    { title: "Facility Helpdesk", category: "System", desc: "Digitalisasi pelaporan fasilitas sekolah dengan alur tiket terpadu dan UX interaktif.", image: "/foto-project/weblaporfasilitas.png", github: "https://github.com/Fardan07/project_ukl_sija2" },
-                    { title: "Web Dinamis", category: "Fullstack", desc: "Platform web edukasi & artikel dinamis berbasis PHP & SQL dengan UX copywriting persuasif.", image: "/foto-project/projectwebdinamis.png", github: "https://github.com/Fardan07/web-dinamis-project" },
-                  ][activeProject].image} 
-                  alt={[
-                    { title: "Admin Dashboard", category: "Web App", desc: "Sistem manajemen tugas & dashboard administrator modern dengan analitik intuitif.", image: "/foto-project/assignment-admindashboard.png", github: "https://github.com/Fardan07/assigment-management" },
-                    { title: "Facility Helpdesk", category: "System", desc: "Digitalisasi pelaporan fasilitas sekolah dengan alur tiket terpadu dan UX interaktif.", image: "/foto-project/weblaporfasilitas.png", github: "https://github.com/Fardan07/project_ukl_sija2" },
-                    { title: "Web Dinamis", category: "Fullstack", desc: "Platform web edukasi & artikel dinamis berbasis PHP & SQL dengan UX copywriting persuasif.", image: "/foto-project/projectwebdinamis.png", github: "https://github.com/Fardan07/web-dinamis-project" },
-                  ][activeProject].title} 
-                  fill 
-                  className="object-cover opacity-35 hover:opacity-60 transition-opacity duration-500" 
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent z-10 pointer-events-none"></div>
-
-                {/* Top Badge Info */}
-                <div className="relative z-20 flex justify-between items-center">
-                  <div className="bg-amber-500/10 border border-amber-500/30 px-3 py-1 text-xs font-mono font-bold text-amber-400 backdrop-blur-md rounded-md">
-                    {[
-                      { title: "Admin Dashboard", category: "Web App", desc: "Sistem manajemen tugas & dashboard administrator modern dengan analitik intuitif.", image: "/foto-project/assignment-admindashboard.png", github: "https://github.com/Fardan07/assigment-management" },
-                      { title: "Facility Helpdesk", category: "System", desc: "Digitalisasi pelaporan fasilitas sekolah dengan alur tiket terpadu dan UX interaktif.", image: "/foto-project/weblaporfasilitas.png", github: "https://github.com/Fardan07/project_ukl_sija2" },
-                      { title: "Web Dinamis", category: "Fullstack", desc: "Platform web edukasi & artikel dinamis berbasis PHP & SQL dengan UX copywriting persuasif.", image: "/foto-project/projectwebdinamis.png", github: "https://github.com/Fardan07/web-dinamis-project" },
-                    ][activeProject].category}
-                  </div>
-                  <div className="text-xs font-mono text-neutral-400">
-                    ITEM <span className="text-amber-400 font-bold">0{activeProject + 1}</span> / 03
+                {/* Image Container */}
+                <div className="relative aspect-[16/10] w-full overflow-hidden bg-neutral-900/60 border-b border-neutral-800/80">
+                  <Image
+                    src={project.image}
+                    alt={project.title}
+                    fill
+                    className="object-cover object-top group-hover:scale-105 transition-transform duration-500 ease-out"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
+                  <div className="absolute top-3 left-3 z-10">
+                    <span className="text-[10px] font-mono font-bold text-neutral-300 bg-black/85 border border-neutral-700 px-2.5 py-0.5 rounded shadow-md tracking-wider">
+                      CASE // 0{idx + 1}
+                    </span>
                   </div>
                 </div>
 
-                {/* Project Content Bottom */}
-                <div className="relative z-20 mt-16 md:mt-24">
-                  <h3 className="text-2xl md:text-3xl font-bold text-white mb-2 font-mono">
-                    {[
-                      { title: "Admin Dashboard", category: "Web App", desc: "Sistem manajemen tugas & dashboard administrator modern dengan analitik intuitif.", image: "/foto-project/assignment-admindashboard.png", github: "https://github.com/Fardan07/assigment-management" },
-                      { title: "Facility Helpdesk", category: "System", desc: "Digitalisasi pelaporan fasilitas sekolah dengan alur tiket terpadu dan UX interaktif.", image: "/foto-project/weblaporfasilitas.png", github: "https://github.com/Fardan07/project_ukl_sija2" },
-                      { title: "Web Dinamis", category: "Fullstack", desc: "Platform web edukasi & artikel dinamis berbasis PHP & SQL dengan UX copywriting persuasif.", image: "/foto-project/projectwebdinamis.png", github: "https://github.com/Fardan07/web-dinamis-project" },
-                    ][activeProject].title}
-                  </h3>
-                  <p className="text-sm text-neutral-300 font-mono max-w-xl mb-6 leading-relaxed">
-                    {[
-                      { title: "Admin Dashboard", category: "Web App", desc: "Sistem manajemen tugas & dashboard administrator modern dengan analitik intuitif.", image: "/foto-project/assignment-admindashboard.png", github: "https://github.com/Fardan07/assigment-management" },
-                      { title: "Facility Helpdesk", category: "System", desc: "Digitalisasi pelaporan fasilitas sekolah dengan alur tiket terpadu dan UX interaktif.", image: "/foto-project/weblaporfasilitas.png", github: "https://github.com/Fardan07/project_ukl_sija2" },
-                      { title: "Web Dinamis", category: "Fullstack", desc: "Platform web edukasi & artikel dinamis berbasis PHP & SQL dengan UX copywriting persuasif.", image: "/foto-project/projectwebdinamis.png", github: "https://github.com/Fardan07/web-dinamis-project" },
-                    ][activeProject].desc}
-                  </p>
-                  
-                  <div className="flex justify-between items-center pt-4 border-t border-neutral-800/80">
-                    <a 
-                      href={[
-                        { title: "Admin Dashboard", category: "Web App", desc: "Sistem manajemen tugas & dashboard administrator modern dengan analitik intuitif.", image: "/foto-project/assignment-admindashboard.png", github: "https://github.com/Fardan07/assigment-management" },
-                        { title: "Facility Helpdesk", category: "System", desc: "Digitalisasi pelaporan fasilitas sekolah dengan alur tiket terpadu dan UX interaktif.", image: "/foto-project/weblaporfasilitas.png", github: "https://github.com/Fardan07/project_ukl_sija2" },
-                        { title: "Web Dinamis", category: "Fullstack", desc: "Platform web edukasi & artikel dinamis berbasis PHP & SQL dengan UX copywriting persuasif.", image: "/foto-project/projectwebdinamis.png", github: "https://github.com/Fardan07/web-dinamis-project" },
-                      ][activeProject].github} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="inline-flex items-center gap-2 text-xs font-mono font-bold text-black bg-amber-400 hover:bg-amber-300 px-4 py-2 rounded-full transition-all hover:scale-105 shadow-[0_0_15px_rgba(251,191,36,0.3)]"
-                    >
-                      <FaGithub className="w-4 h-4" /> VIEW CODE
-                    </a>
-
-                    <div className="text-[10px] font-mono text-amber-500/70 tracking-widest hidden sm:block">
-                      3D_SYSTEM // ROTATED
+                {/* Card Content */}
+                <div className="p-6 flex flex-col justify-between flex-1">
+                  <div>
+                    {/* Category & Year */}
+                    <div className="flex items-center justify-between text-xs font-mono mb-3">
+                      <span className="text-amber-400 font-medium bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full">
+                        {project.category}
+                      </span>
+                      <span className="text-neutral-500">{project.year}</span>
                     </div>
+
+                    {/* Title */}
+                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">
+                      {project.title}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-sm text-neutral-400 leading-relaxed mb-5">
+                      {project.desc}
+                    </p>
+                  </div>
+
+                  <div>
+                    {/* Tech stack badges */}
+                    <div className="flex flex-wrap gap-1.5 mb-6">
+                      {project.tech.map((t, tIdx) => (
+                        <span
+                          key={tIdx}
+                          className="text-[11px] font-mono text-neutral-400 bg-neutral-900 border border-neutral-800 px-2 py-0.5 rounded"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* GitHub Link */}
+                    <a
+                      href={project.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-xs font-mono font-bold text-neutral-300 hover:text-amber-400 transition-colors group/link"
+                    >
+                      <FaGithub className="w-4 h-4 text-neutral-400 group-hover/link:text-amber-400 transition-colors" />
+                      <span>Lihat Source Code</span>
+                      <span className="group-hover/link:translate-x-1 transition-transform">&rarr;</span>
+                    </a>
                   </div>
                 </div>
               </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* Carousel Controls */}
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-6 max-w-3xl mx-auto">
-            {/* Direct Jump Pills */}
-            <div className="flex flex-wrap gap-2 justify-center">
-              {[
-                { title: "Admin Dashboard" },
-                { title: "Facility Helpdesk" },
-                { title: "Web Dinamis" },
-              ].map((proj, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => {
-                    setProjectDir(idx > activeProject ? 1 : -1);
-                    setActiveProject(idx);
-                  }}
-                  className={`px-3 py-1 text-xs font-mono rounded-full border transition-all ${
-                    idx === activeProject 
-                      ? "bg-amber-500/20 border-amber-500 text-amber-400 font-bold shadow-[0_0_10px_rgba(251,191,36,0.2)]" 
-                      : "border-neutral-800 text-neutral-500 hover:text-neutral-300"
-                  }`}
-                >
-                  0{idx + 1}. {proj.title}
-                </button>
-              ))}
-            </div>
-
-            {/* Prev/Next Buttons */}
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => {
-                  setProjectDir(-1);
-                  setActiveProject((prev) => (prev - 1 + 3) % 3);
-                }}
-                className="p-3 rounded-full border border-neutral-800 hover:border-amber-500 bg-neutral-900/80 text-neutral-300 hover:text-amber-400 transition-all hover:scale-110 active:scale-95 shadow-md"
-                aria-label="Previous Project"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-
-              <div className="text-xs font-mono text-neutral-400 px-2 font-bold">
-                <span className="text-amber-400">0{activeProject + 1}</span> / 03
-              </div>
-
-              <button
-                onClick={() => {
-                  setProjectDir(1);
-                  setActiveProject((prev) => (prev + 1) % 3);
-                }}
-                className="p-3 rounded-full border border-neutral-800 hover:border-amber-500 bg-neutral-900/80 text-neutral-300 hover:text-amber-400 transition-all hover:scale-110 active:scale-95 shadow-md"
-                aria-label="Next Project"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Certificates Section */}
-      <section id="certificates" className="py-24 px-4 relative z-10 bg-neutral-900/40 border-t border-neutral-800/50 overflow-hidden">
-        <div className="max-w-5xl mx-auto">
+      <section id="certificates" className="py-24 px-4 relative z-10 border-t border-neutral-800/50 bg-neutral-950/40">
+        <div className="max-w-6xl mx-auto">
+          {/* Section Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-12 flex flex-col items-center text-center"
+            className="mb-14 text-center"
           >
+            <span className="text-xs font-mono text-amber-400 tracking-[0.2em] uppercase font-bold mb-2 block">
+              SERTIFIKASI & PENGHARGAAN
+            </span>
             <motion.h2 
               initial={{ opacity: 0.1, textShadow: "0 0 0px rgba(251,191,36,0)" }}
               whileInView={{ opacity: 1, textShadow: "0 0 20px rgba(251,191,36,0.6)" }}
               transition={{ duration: 1 }}
               viewport={{ once: true }}
-              className="text-4xl md:text-5xl font-black uppercase tracking-tight mb-2 text-amber-50"
+              className="text-4xl md:text-5xl font-black uppercase tracking-tight text-amber-50"
             >
-              CERTIFICATES
+              SERTIFIKAT
             </motion.h2>
-            <p className="text-amber-400 font-mono text-sm">ACHIEVEMENTS & VALIDATIONS</p>
           </motion.div>
 
-          {/* 3D Rotating Certificate Carousel Container */}
-          <div className="relative min-h-[360px] md:min-h-[420px] flex items-center justify-center [perspective:1200px]">
-            <AnimatePresence custom={certDir} mode="wait">
+          {/* 4-Column Minimalist Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {certificatesData.map((cert, idx) => (
               <motion.div
-                key={activeCert}
-                custom={certDir}
-                variants={{
-                  enter: (dir: number) => ({
-                    x: dir > 0 ? 160 : -160,
-                    scale: 0.85,
-                    opacity: 0,
-                    filter: "blur(6px)",
-                  }),
-                  center: {
-                    x: 0,
-                    scale: 1,
-                    opacity: 1,
-                    filter: "blur(0px)",
-                    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
-                  },
-                  exit: (dir: number) => ({
-                    x: dir > 0 ? -160 : 160,
-                    scale: 0.85,
-                    opacity: 0,
-                    filter: "blur(6px)",
-                    transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
-                  }),
-                }}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                style={{ transformStyle: "preserve-3d" }}
-                onClick={() => setSelectedCert({ 
-                  image: [
-                    { title: "DigiUp Certification", image: "/foto-sertifikat/DigiUp Fardan.png", desc: "Sertifikasi keahlian digital Telkom University." },
-                    { title: "ElevAlte Event", image: "/foto-sertifikat/ElevAlte - Fardan.png", desc: "Penghargaan partisipasi pada event ElevAlte." },
-                    { title: "FicpactCup", image: "/foto-sertifikat/FicpactCup - Fardan.jpeg", desc: "Prestasi dan keikutsertaan kompetisi FicpactCup." },
-                    { title: "Sefest", image: "/foto-sertifikat/Sefest - Fardan.png", desc: "Sertifikat penghargaan Sefest Exhibition." },
-                  ][activeCert].image, 
-                  title: [
-                    { title: "DigiUp Certification", image: "/foto-sertifikat/DigiUp Fardan.png", desc: "Sertifikasi keahlian digital Telkom University." },
-                    { title: "ElevAlte Event", image: "/foto-sertifikat/ElevAlte - Fardan.png", desc: "Penghargaan partisipasi pada event ElevAlte." },
-                    { title: "FicpactCup", image: "/foto-sertifikat/FicpactCup - Fardan.jpeg", desc: "Prestasi dan keikutsertaan kompetisi FicpactCup." },
-                    { title: "Sefest", image: "/foto-sertifikat/Sefest - Fardan.png", desc: "Sertifikat penghargaan Sefest Exhibition." },
-                  ][activeCert].title 
-                })}
-                className="w-full max-w-3xl aspect-[1.5] relative rounded-xl overflow-hidden border border-amber-500/40 bg-neutral-950 p-4 md:p-8 cursor-pointer group shadow-[0_0_40px_rgba(251,191,36,0.15)] flex items-center justify-center"
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                onClick={() => setSelectedCert({ image: cert.image, title: cert.title })}
+                className="rounded-2xl bg-neutral-950/70 border border-neutral-800/80 hover:border-amber-500/40 transition-all duration-300 overflow-hidden flex flex-col group cursor-pointer hover:-translate-y-1.5 shadow-lg"
               >
-                {/* Cyberpunk corner markers */}
-                <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-amber-500 group-hover:border-amber-300 transition-colors z-20"></div>
-                <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-amber-500 group-hover:border-amber-300 transition-colors z-20"></div>
-                <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-amber-500 group-hover:border-amber-300 transition-colors z-20"></div>
-                <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-amber-500 group-hover:border-amber-300 transition-colors z-20"></div>
-                
-                {/* Tech label */}
-                <div className="absolute top-3 right-3 bg-amber-500/20 border border-amber-500/40 px-2 py-1 text-[8px] md:text-[10px] font-mono font-bold text-amber-400 z-20 rounded">
-                  VERIFIED // CLICK TO ENLARGE
+                {/* Certificate Document Preview */}
+                <div className="relative aspect-[1.414] w-full overflow-hidden bg-neutral-900/60 p-3 flex items-center justify-center border-b border-neutral-800/80">
+                  <Image
+                    src={cert.image}
+                    alt={cert.title}
+                    fill
+                    className="object-contain p-2 group-hover:scale-105 transition-transform duration-500 ease-out"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                    <span className="text-xs font-mono font-bold text-amber-400 bg-black/80 px-3 py-1.5 rounded-full border border-amber-500/40 shadow-lg flex items-center gap-1.5">
+                      <Maximize2 className="w-3.5 h-3.5" /> Perbesar
+                    </span>
+                  </div>
                 </div>
 
-                <div className="relative w-full h-full z-10">
-                  <Image 
-                    src={[
-                      { title: "DigiUp Certification", image: "/foto-sertifikat/DigiUp Fardan.png", desc: "Sertifikasi keahlian digital Telkom University." },
-                      { title: "ElevAlte Event", image: "/foto-sertifikat/ElevAlte - Fardan.png", desc: "Penghargaan partisipasi pada event ElevAlte." },
-                      { title: "FicpactCup", image: "/foto-sertifikat/FicpactCup - Fardan.jpeg", desc: "Prestasi dan keikutsertaan kompetisi FicpactCup." },
-                      { title: "Sefest", image: "/foto-sertifikat/Sefest - Fardan.png", desc: "Sertifikat penghargaan Sefest Exhibition." },
-                    ][activeCert].image} 
-                    alt={[
-                      { title: "DigiUp Certification", image: "/foto-sertifikat/DigiUp Fardan.png", desc: "Sertifikasi keahlian digital Telkom University." },
-                      { title: "ElevAlte Event", image: "/foto-sertifikat/ElevAlte - Fardan.png", desc: "Penghargaan partisipasi pada event ElevAlte." },
-                      { title: "FicpactCup", image: "/foto-sertifikat/FicpactCup - Fardan.jpeg", desc: "Prestasi dan keikutsertaan kompetisi FicpactCup." },
-                      { title: "Sefest", image: "/foto-sertifikat/Sefest - Fardan.png", desc: "Sertifikat penghargaan Sefest Exhibition." },
-                    ][activeCert].title} 
-                    fill 
-                    className="object-contain opacity-80 group-hover:opacity-100 group-hover:scale-[1.02] transition-all duration-500" 
-                  />
-                </div>
-                
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 z-20">
-                   <h3 className="text-xl md:text-2xl font-bold text-amber-400 font-mono translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                     {[
-                       { title: "DigiUp Certification", image: "/foto-sertifikat/DigiUp Fardan.png", desc: "Sertifikasi keahlian digital Telkom University." },
-                       { title: "ElevAlte Event", image: "/foto-sertifikat/ElevAlte - Fardan.png", desc: "Penghargaan partisipasi pada event ElevAlte." },
-                       { title: "FicpactCup", image: "/foto-sertifikat/FicpactCup - Fardan.jpeg", desc: "Prestasi dan keikutsertaan kompetisi FicpactCup." },
-                       { title: "Sefest", image: "/foto-sertifikat/Sefest - Fardan.png", desc: "Sertifikat penghargaan Sefest Exhibition." },
-                     ][activeCert].title}
-                   </h3>
-                   <p className="text-xs text-neutral-200 font-mono mt-1 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75 border-l-2 border-amber-500 pl-2 leading-relaxed">
-                     {[
-                       { title: "DigiUp Certification", image: "/foto-sertifikat/DigiUp Fardan.png", desc: "Sertifikasi keahlian digital Telkom University." },
-                       { title: "ElevAlte Event", image: "/foto-sertifikat/ElevAlte - Fardan.png", desc: "Penghargaan partisipasi pada event ElevAlte." },
-                       { title: "FicpactCup", image: "/foto-sertifikat/FicpactCup - Fardan.jpeg", desc: "Prestasi dan keikutsertaan kompetisi FicpactCup." },
-                       { title: "Sefest", image: "/foto-sertifikat/Sefest - Fardan.png", desc: "Sertifikat penghargaan Sefest Exhibition." },
-                     ][activeCert].desc}
-                   </p>
+                {/* Certificate Info */}
+                <div className="p-5 flex flex-col justify-between flex-1">
+                  <div>
+                    <div className="flex items-center justify-between text-[11px] font-mono mb-2 text-neutral-500">
+                      <span>{cert.issuer}</span>
+                      <span className="text-amber-500/80">{cert.year}</span>
+                    </div>
+
+                    <h3 className="text-base font-bold text-white group-hover:text-amber-400 transition-colors leading-snug">
+                      {cert.title}
+                    </h3>
+                  </div>
+
+                  <p className="text-xs text-neutral-400 mt-2 font-sans">
+                    {cert.category}
+                  </p>
                 </div>
               </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* Carousel Controls */}
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-6 max-w-3xl mx-auto">
-            {/* Direct Jump Pills */}
-            <div className="flex flex-wrap gap-2 justify-center">
-              {[
-                { title: "DigiUp" },
-                { title: "ElevAlte" },
-                { title: "FicpactCup" },
-                { title: "Sefest" },
-              ].map((cert, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => {
-                    setCertDir(idx > activeCert ? 1 : -1);
-                    setActiveCert(idx);
-                  }}
-                  className={`px-3 py-1 text-xs font-mono rounded-full border transition-all ${
-                    idx === activeCert 
-                      ? "bg-amber-500/20 border-amber-500 text-amber-400 font-bold shadow-[0_0_10px_rgba(251,191,36,0.2)]" 
-                      : "border-neutral-800 text-neutral-500 hover:text-neutral-300"
-                  }`}
-                >
-                  0{idx + 1}. {cert.title}
-                </button>
-              ))}
-            </div>
-
-            {/* Prev/Next Buttons */}
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => {
-                  setCertDir(-1);
-                  setActiveCert((prev) => (prev - 1 + 4) % 4);
-                }}
-                className="p-3 rounded-full border border-neutral-800 hover:border-amber-500 bg-neutral-900/80 text-neutral-300 hover:text-amber-400 transition-all hover:scale-110 active:scale-95 shadow-md"
-                aria-label="Previous Certificate"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-
-              <div className="text-xs font-mono text-neutral-400 px-2 font-bold">
-                <span className="text-amber-400">0{activeCert + 1}</span> / 04
-              </div>
-
-              <button
-                onClick={() => {
-                  setCertDir(1);
-                  setActiveCert((prev) => (prev + 1) % 4);
-                }}
-                className="p-3 rounded-full border border-neutral-800 hover:border-amber-500 bg-neutral-900/80 text-neutral-300 hover:text-amber-400 transition-all hover:scale-110 active:scale-95 shadow-md"
-                aria-label="Next Certificate"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
+            ))}
           </div>
         </div>
       </section>
       {/* Footer / Contact */}
       <section id="contact" className="py-20 px-6 relative z-10 border-t border-neutral-800/50 bg-[#050505]">
         <div className="max-w-6xl mx-auto">
+          {/* Retro Industrial Status Header */}
+          <div className="w-full flex flex-col sm:flex-row items-center justify-between pb-6 mb-10 border-b border-neutral-800/80 gap-4">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]"></span>
+              <span className="text-xs font-mono text-neutral-300 font-bold tracking-widest uppercase">
+                TERMINAL // TERBUKA UNTUK KOLABORASI & KERJASAMA
+              </span>
+            </div>
+            <a
+              href="#about"
+              onClick={(e) => scrollToSection(e, "#about")}
+              className="text-[11px] font-mono text-neutral-300 hover:text-amber-400 transition-colors flex items-center gap-1.5 cursor-pointer bg-neutral-900 border border-neutral-700/80 px-3.5 py-1 rounded-full hover:border-amber-500/40"
+            >
+              <span>KEMBALI KE ATAS [ ↑ ]</span>
+            </a>
+          </div>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -1002,7 +1018,7 @@ export default function Portfolio() {
             {/* Socials & Contact Links */}
             <div className="flex flex-col sm:flex-row gap-12 text-center sm:text-left w-full justify-between">
               <div>
-                <h4 className="text-white font-bold mb-4 font-mono">SOCIALS</h4>
+                <h4 className="text-white font-bold mb-4 font-mono">MEDIA SOSIAL</h4>
                 <div className="flex flex-col gap-2 text-sm text-neutral-400">
                   <a href="https://github.com/Fardan07" target="_blank" rel="noopener noreferrer" className="hover:text-amber-400 transition-colors">GitHub</a>
                   <a href="https://www.linkedin.com/in/muhammad-fardan-5a32a4423/" target="_blank" rel="noopener noreferrer" className="hover:text-amber-400 transition-colors">LinkedIn</a>
@@ -1010,7 +1026,7 @@ export default function Portfolio() {
                 </div>
               </div>
               <div>
-                <h4 className="text-white font-bold mb-4 font-mono">CONTACT</h4>
+                <h4 className="text-white font-bold mb-4 font-mono">KONTAK</h4>
                 <div className="flex flex-col gap-2 text-sm text-neutral-400">
                   <a href="mailto:contact.fardan07@gmail.com" className="hover:text-amber-400 transition-colors break-all">contact.fardan07@gmail.com</a>
                   <p>Sidoarjo, Indonesia</p>
@@ -1020,7 +1036,7 @@ export default function Portfolio() {
           </motion.div>
           
           <div className="mt-16 pt-8 border-t border-neutral-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-mono text-neutral-500">
-            <p>© {new Date().getFullYear()} MUHAMMAD FARDAN. ALL RIGHTS RESERVED.</p>
+            <p>© {new Date().getFullYear()} MUHAMMAD FARDAN. HAK CIPTA DILINDUNGI.</p>
             <div className="flex gap-6">
               <span className="text-amber-500 font-bold tracking-widest">PORTFOLIO v3.0</span>
             </div>
