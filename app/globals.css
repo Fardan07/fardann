@@ -1,10 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0a; /* Almost black */
-  --foreground: #f8fafc; /* Slate 50 for text */
-  --accent: #fbbf24; /* Amber 400 (Gold) */
-  --accent-glow: rgba(251, 191, 36, 0.5);
+  --background: #0a0a0a;
+  --foreground: #f8fafc;
+  --accent: #dc2626;
+  --border: rgba(255, 255, 255, 0.09);
+  --border-hover: rgba(255, 255, 255, 0.22);
 }
 
 @theme inline {
@@ -15,117 +16,55 @@
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
   scroll-behavior: smooth;
-  
-  /* Abstract Fluid Background with Dark Overlay */
-  background-image: 
-    radial-gradient(circle at 10% 20%, rgba(251, 191, 36, 0.08), transparent 30%),
-    radial-gradient(circle at 90% 80%, rgba(217, 119, 6, 0.05), transparent 30%),
-    linear-gradient(to bottom, rgba(10, 10, 10, 0.88), rgba(10, 10, 10, 0.96)),
+
+  /* Ambient Abstract Background with Dimensional Dark Overlay */
+  background-image:
+    radial-gradient(circle at 15% 18%, rgba(220, 38, 38, 0.08), transparent 35%),
+    radial-gradient(circle at 85% 82%, rgba(255, 255, 255, 0.04), transparent 40%),
+    linear-gradient(to bottom, rgba(10, 10, 12, 0.78), rgba(10, 10, 12, 0.90)),
     url('/bg-abstract.png');
   background-size: cover, cover, cover, cover;
   background-position: center;
   background-attachment: fixed;
 }
 
-/* Typography styles for Wow Factor */
-.text-huge {
-  font-size: clamp(3rem, 8vw, 6rem);
-  line-height: 1;
-  font-weight: 900;
-  letter-spacing: -0.02em;
+/* Dimensional translucent card that lets the background breathe through */
+.surface-card {
+  background: rgba(17, 17, 19, 0.68);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+  border-top-color: rgba(255, 255, 255, 0.14);
+  border-radius: 0.875rem;
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
+    0 12px 32px -12px rgba(0, 0, 0, 0.65);
+  transition: border-color 0.25s ease, background-color 0.25s ease, transform 0.25s ease;
 }
 
-.text-stroke {
-  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
-  color: transparent;
+.surface-card:hover {
+  background: rgba(24, 24, 27, 0.78);
+  border-color: var(--border-hover);
 }
 
-.text-stroke:hover {
-  color: var(--foreground);
-  -webkit-text-stroke: 0px;
-  transition: all 0.3s ease;
-  text-shadow: 0 0 20px var(--accent-glow);
-}
-
-/* Glassmorphism utility - elegant */
-.glass {
-  background: rgba(20, 20, 20, 0.6);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(251, 191, 36, 0.1);
-  border-radius: 1rem;
-}
-
-.glass-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.glass-hover:hover {
-  background: rgba(30, 30, 30, 0.8);
-  border: 1px solid rgba(251, 191, 36, 0.4);
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px -10px var(--accent-glow);
-}
-
-/* Custom glow utility */
-.text-glow {
-  text-shadow: 0 0 20px var(--accent-glow);
-}
-
-/* Gradient Text */
-.text-gradient {
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-image: linear-gradient(135deg, #fcd34d, #b45309);
-}
-
-/* Profile Picture - Rotation & Gold Glow */
-.profile-pic-container {
-  position: relative;
-  width: 280px;
-  height: 280px;
-  border-radius: 50%;
-  padding: 4px;
-  background: linear-gradient(135deg, #fbbf24, #92400e);
-  box-shadow: 0 0 40px rgba(251, 191, 36, 0.2);
-}
-
-.profile-pic-inner {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  overflow: hidden;
-  position: relative;
-  background: var(--background);
-}
-
-.profile-pic {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center top; /* Align to the top of the image so the head isn't cut off */
-}
-
-/* Progress bar for languages */
+/* Minimal progress bar for languages */
 .progress-bar-bg {
-  background: rgba(255, 255, 255, 0.1);
-  height: 6px;
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  height: 5px;
+  border-radius: 9999px;
   overflow: hidden;
   width: 100%;
 }
 
 .progress-bar-fill {
-  background: linear-gradient(90deg, #fbbf24, #d97706);
+  background: linear-gradient(90deg, #dc2626, #ef4444);
   height: 100%;
-  border-radius: 3px;
-  box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+  border-radius: 9999px;
 }
 
 /* Base custom scrollbar */
@@ -142,48 +81,3 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #3f3f46;
 }
-
-/* --- RETRO CRT SCANLINE & VINTAGE PHOSPHOR GLOW --- */
-.crt-scanlines {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 30;
-  background: 
-    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.22) 50%),
-    radial-gradient(circle at center, transparent 60%, rgba(0, 0, 0, 0.5) 100%);
-  background-size: 100% 4px, 100% 100%;
-  opacity: 0.55;
-}
-
-/* Retro Pixel Border & Arcade Panel */
-.retro-card {
-  background: rgba(13, 13, 15, 0.85);
-  border: 1px solid rgba(251, 191, 36, 0.2);
-  box-shadow: 
-    inset 0 0 15px rgba(251, 191, 36, 0.03),
-    0 8px 30px rgba(0, 0, 0, 0.7);
-  position: relative;
-}
-
-.retro-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(251, 191, 36, 0.4), transparent);
-}
-
-.retro-badge {
-  font-family: var(--font-mono);
-  background: rgba(251, 191, 36, 0.08);
-  border: 1px solid rgba(251, 191, 36, 0.3);
-  color: #fbbf24;
-  text-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
-}
-
